@@ -69,6 +69,7 @@ import com.example.ui.screens.PlansProfileScreen
 import com.example.ui.screens.PortfolioAlertsScreen
 import com.example.ui.screens.PulseScreen
 import com.example.ui.screens.SmartWatchlistScreen
+import com.example.ui.screens.WebReplicaScreen
 import com.example.ui.viewmodel.FinAdvisorViewModel
 import com.example.ui.viewmodel.UiState
 import com.example.util.PriceNotificationHelper
@@ -80,6 +81,7 @@ const val ROUTE_PORTFOLIO = "portfolio"
 const val ROUTE_PLANS = "plans"
 const val ROUTE_DIAGNOSTICS = "diagnostics"
 const val ROUTE_WATCHLIST = "watchlist"
+const val ROUTE_WEB_REPLICA = "web_replica"
 
 private data class NavTab(
     val route: String,
@@ -272,6 +274,7 @@ private fun FinAdvisorMainShell() {
                                 onNavigatePlans = { navigateTab(ROUTE_PLANS) },
                                 onNavigateDiagnostics = { navController.navigate(ROUTE_DIAGNOSTICS) },
                                 onNavigateWatchlist = { navController.navigate(ROUTE_WATCHLIST) },
+                                onNavigateWebReplica = { navController.navigate(ROUTE_WEB_REPLICA) },
                                 watchlistCount = watchedItems.size,
                                 watchlistDivergenceCount = watchlistDivergenceCount,
                                 onSelectStockForDeepDive = { stock ->
@@ -387,6 +390,11 @@ private fun FinAdvisorMainShell() {
                                 onCreateHedgeAlert = { stock ->
                                     viewModel.createAlert(stock.symbol, stock.exchange, 2.5, "both")
                                 },
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
+                        composable(ROUTE_WEB_REPLICA) {
+                            WebReplicaScreen(
                                 onNavigateBack = { navController.popBackStack() }
                             )
                         }

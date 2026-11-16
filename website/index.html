@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinAdvisor — D2C Global Investment & Divergence Terminal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070d17;
+      --surface: #0e1726;
+      --surface-elevated: #162238;
+      --surface-highlight: #1e2d47;
+      --outline: #283a57;
+      --text: #f3f6fc;
+      --muted: #94a3b8;
+      --emerald: #00d09c;
+      --emerald-dim: rgba(0, 208, 156, 0.14);
+      --gold: #f5b731;
+      --gold-dim: rgba(245, 183, 49, 0.16);
+      --cyan: #38bdf8;
+      --cyan-dim: rgba(56, 189, 248, 0.14);
+      --violet: #a78bfa;
+      --crimson: #ff5a65;
+      --crimson-dim: rgba(255, 90, 101, 0.16);
+      --shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+      --radius: 20px;
+    }
+
+    [data-theme="light"] {
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --surface-elevated: #edf2f7;
+      --surface-highlight: #e2e8f0;
+      --outline: #d5dee9;
+      --text: #0f172a;
+      --muted: #475569;
+      --emerald: #047857;
+      --emerald-dim: rgba(4, 120, 87, 0.12);
+      --gold: #b45309;
+      --gold-dim: rgba(180, 83, 9, 0.12);
+      --cyan: #0284c7;
+      --cyan-dim: rgba(2, 132, 199, 0.12);
+      --violet: #6d28d9;
+      --crimson: #dc2626;
+      --crimson-dim: rgba(220, 38, 38, 0.12);
+      --shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, .display-font {
+      font-family: 'Outfit', sans-serif;
+      letter-spacing: -0.02em;
+    }
+
+    .mono { font-family: 'JetBrains Mono', monospace; }
+
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Desktop Sidebar Rail */
+    .sidebar {
+      width: 248px;
+      background: var(--surface);
+      border-right: 1px solid var(--outline);
+      padding: 20px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      flex-shrink: 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px 18px;
+      border-bottom: 1px solid var(--outline);
+      margin-bottom: 6px;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--emerald), var(--cyan));
+      display: grid;
+      place-items: center;
+      color: #071018;
+      font-weight: 800;
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.16s ease;
+      text-align: left;
+    }
+
+    .nav-btn:hover {
+      background: var(--surface-elevated);
+      color: var(--text);
+    }
+
+    .nav-btn.active {
+      background: var(--emerald-dim);
+      color: var(--emerald);
+      border-color: rgba(0, 208, 156, 0.35);
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid var(--outline);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .main-wrap {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(7, 13, 23, 0.82);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--outline);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    [data-theme="light"] .topbar {
+      background: rgba(245, 247, 251, 0.88);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tier-toggle {
+      display: inline-flex;
+      background: var(--surface-elevated);
+      border: 1px solid var(--outline);
+      border-radius: 999px;
+      padding: 3px;
+      gap: 4px;
+    }
+
+    .tier-pill {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .tier-pill.active-student {
+      background: var(--cyan);
+      color: #06131f;
+    }
+
+    .tier-pill.active-adult {
+      background: var(--gold);
+      color: #1d1202;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge-emerald { background: var(--emerald-dim); color: var(--emerald); }
+    .badge-gold { background: var(--gold-dim); color: var(--gold); }
+    .badge-crimson { background: var(--crimson-dim); color: var(--crimson); }
+    .badge-cyan { background: var(--cyan-dim); color: var(--cyan); }
+    .badge-neutral { background: var(--surface-elevated); color: var(--muted); border: 1px solid var(--outline); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: transform 0.1s ease, opacity 0.15s ease;
+    }
+
+    .btn:active { transform: scale(0.98); }
+
+    .btn-primary {
+      background: var(--emerald);
+      color: #05130f;
+    }
+
+    .btn-secondary {
+      background: var(--surface-elevated);
+      color: var(--text);
+      border-color: var(--outline);
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: #1c1202;
+    }
+
+    .btn-sm {
+      min-height: 36px;
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .content {
+      max-width: 1120px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px 24px 90px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--outline);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card {
+      background:
+        radial-gradient(circle at 85% 15%, rgba(0, 208, 156, 0.22), transparent 45%),
+        radial-gradient(circle at 12% 85%, rgba(56, 189, 248, 0.16), transparent 45%),
+        linear-gradient(135deg, #0b1424, #0f1d33);
+      color: #f8fafc;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 24px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .hero-value {
+      font-size: clamp(30px, 4.2vw, 44px);
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .ticker-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 12px;
+    }
+
+    .chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      padding: 7px 13px;
+      border-radius: 999px;
+      background: var(--surface-elevated);
+      border: 1px solid var(--outline);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .chip.selected {
+      background: var(--emerald-dim);
+      color: var(--emerald);
+      border-color: var(--emerald);
+    }
+
+    .pos { color: var(--emerald); }
+    .neg { color: var(--crimson); }
+    .warn { color: var(--gold); }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .factor-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .factor-box {
+      background: var(--surface-elevated);
+      border-radius: 10px;
+      padding: 8px;
+    }
+
+    .bar-track {
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.22);
+      margin-top: 5px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--cyan), var(--emerald));
+    }
+
+    .chart-box {
+      width: 100%;
+      height: 260px;
+      position: relative;
+      margin-top: 10px;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--outline);
+    }
+
+    th {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+
+    input[type="text"], input[type="number"], select {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--outline);
+      background: var(--surface-elevated);
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--emerald);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.72);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 60;
+    }
+
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      width: 100%;
+      max-width: 520px;
+      max-height: 88vh;
+      overflow-y: auto;
+      background: var(--surface);
+      border: 1px solid var(--outline);
+      border-radius: 22px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      z-index: 80;
+      background: var(--surface-elevated);
+      color: var(--text);
+      border: 1px solid var(--emerald);
+      border-radius: 14px;
+      padding: 12px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: var(--shadow);
+      display: none;
+      max-width: 340px;
+    }
+
+    .toast.show { display: block; }
+
+    /* Mobile Bottom Bar */
+    .bottom-nav {
+      display: none;
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--outline);
+      padding: 6px 4px;
+      z-index: 40;
+      justify-content: space-around;
+    }
+
+    .bottom-nav button {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 6px 8px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .bottom-nav button.active {
+      color: var(--emerald);
+      background: var(--emerald-dim);
+    }
+
+    @media (max-width: 860px) {
+      .sidebar { display: none; }
+      .bottom-nav { display: flex; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .factor-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .content { padding: 14px 14px 86px; }
+      .topbar { padding: 10px 14px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <!-- Desktop Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">FA</div>
+      <div>
+        <div class="display-font" style="font-size:18px;font-weight:800;">FinAdvisor</div>
+        <div class="brand-sub">D2C Global Wealth AI</div>
+      </div>
+    </div>
+    <button class="nav-btn active" data-tab="pulse" onclick="switchTab('pulse')">📊 Global Pulse</button>
+    <button class="nav-btn" data-tab="compare" onclick="switchTab('compare')">🌐 Divergence Lab</button>
+    <button class="nav-btn" data-tab="picks" onclick="switchTab('picks')">✨ AI News &amp; Picks</button>
+    <button class="nav-btn" data-tab="watchlist" onclick="switchTab('watchlist')">📡 Smart Watchlist</button>
+    <button class="nav-btn" data-tab="portfolio" onclick="switchTab('portfolio')">💼 Portfolio &amp; Alerts</button>
+    <button class="nav-btn" data-tab="diagnostics" onclick="switchTab('diagnostics')">🧪 Quant Audit Lab</button>
+    <button class="nav-btn" data-tab="plans" onclick="switchTab('plans')">💎 D2C Plans</button>
+
+    <div class="sidebar-footer">
+      <button class="btn btn-secondary btn-sm" onclick="toggleTheme()" id="themeToggleDesktop">Toggle Light / Dark</button>
+      <div style="font-size:11px;color:var(--muted);padding:2px 4px;">No sign-in required • Local persistence enabled</div>
+    </div>
+  </aside>
+
+  <!-- Main Workspace -->
+  <div class="main-wrap">
+    <header class="topbar">
+      <div class="topbar-left">
+        <span class="display-font" style="font-weight:800;font-size:18px;">FinAdvisor Web</span>
+        <div class="tier-toggle" role="group" aria-label="Subscription tier switcher">
+          <button id="pillStudent" class="tier-pill active-student" onclick="setTier('student')">Student Scholar ($4.99)</button>
+          <button id="pillAdult" class="tier-pill" onclick="setTier('adult')">Adult Quant Pro ($19.99)</button>
+        </div>
+        <span id="liveTickBadge" class="badge badge-emerald">● Live Feed</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="btn btn-secondary btn-sm" onclick="switchTab('watchlist')">Watchlist (<span id="topWatchCount">0</span>)</button>
+        <button class="btn btn-secondary btn-sm" onclick="toggleTheme()">Theme</button>
+      </div>
+    </header>
+
+    <main id="mainContent" class="content"></main>
+  </div>
+</div>
+
+<!-- Mobile Bottom Navigation -->
+<nav class="bottom-nav" aria-label="Mobile Navigation">
+  <button class="active" data-tab="pulse" onclick="switchTab('pulse')"><span>📊</span><span>Pulse</span></button>
+  <button data-tab="compare" onclick="switchTab('compare')"><span>🌐</span><span>Compare</span></button>
+  <button data-tab="picks" onclick="switchTab('picks')"><span>✨</span><span>Picks</span></button>
+  <button data-tab="watchlist" onclick="switchTab('watchlist')"><span>📡</span><span>Watch</span></button>
+  <button data-tab="portfolio" onclick="switchTab('portfolio')"><span>💼</span><span>Portfolio</span></button>
+  <button data-tab="plans" onclick="switchTab('plans')"><span>💎</span><span>Plans</span></button>
+</nav>
+
+<!-- Deep Dive / Add Dialog Modal -->
+<div id="modalBackdrop" class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+  <div id="modalBody" class="modal"></div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// ==================== 1. GLOBAL MARKET CATALOG ====================
+const STORAGE_KEY = "finadvisor_web_mvp_v1";
+
+function buildSeries(baseLevel, totalReturnPct, volAmp, phaseShift, count) {
+  const start = baseLevel / (1 + totalReturnPct / 100);
+  const pts = [];
+  for (let i = 0; i < count; i++) {
+    const progress = count > 1 ? i / (count - 1) : 0;
+    const wave = Math.sin(progress * Math.PI * 3.5 + phaseShift) * volAmp * (1 - progress * 0.25);
+    const normPct = (totalReturnPct * progress) + wave;
+    const level = start * (1 + normPct / 100);
+    pts.push({ label: `T${i + 1}`, level, normPct });
+  }
+  return pts;
+}
+
+const INDICES = [
+  {
+    code: "SPX", name: "S&P 500", country: "United States", region: "US", ccy: "USD", color: "#38bdf8",
+    level: 5984.40, dailyPct: 0.74, vol: 13.8, pe: 25.4, ytd: 21.8,
+    driver: "AI capex resilience & Fed rate path stabilization",
+    insight: "Leading global tech momentum; trading at +4.2x P/E premium vs DAX.",
+    ranges: {
+      "1M": [3.1, 1.1, 0.2, 22], "3M": [7.6, 1.8, 0.4, 24], "6M": [12.9, 2.4, 0.6, 26],
+      "1Y": [26.4, 3.2, 0.8, 30], "5Y": [88.5, 6.8, 1.0, 60]
+    }
+  },
+  {
+    code: "NDX", name: "NASDAQ 100", country: "United States", region: "US", ccy: "USD", color: "#00d09c",
+    level: 21048.15, dailyPct: 1.18, vol: 18.6, pe: 31.2, ytd: 25.4,
+    driver: "Hyperscaler GPU demand & cloud software margin expansion",
+    insight: "Outperforming European industrials by +14.1% YTD on AI earnings upgrades.",
+    ranges: {
+      "1M": [4.4, 1.6, 0.5, 22], "3M": [9.8, 2.6, 0.9, 24], "6M": [15.7, 3.3, 1.1, 26],
+      "1Y": [31.2, 4.5, 1.3, 30], "5Y": [119.4, 9.2, 1.5, 60]
+    }
+  },
+  {
+    code: "N225", name: "NIKKEI 225", country: "Japan", region: "APAC", ccy: "JPY", color: "#f5b731",
+    level: 39180.60, dailyPct: 0.92, vol: 19.4, pe: 19.1, ytd: 16.9,
+    driver: "Tokyo corporate governance reforms & export JPY tailwinds",
+    insight: "Sharp divergence vs DAX during BOJ policy shifts; strong foreign inflows.",
+    ranges: {
+      "1M": [2.2, 1.9, 1.2, 22], "3M": [5.4, 3.1, 1.5, 24], "6M": [9.6, 4.2, 1.8, 26],
+      "1Y": [22.1, 5.0, 2.1, 30], "5Y": [67.2, 7.5, 2.4, 60]
+    }
+  },
+  {
+    code: "DAX", name: "DAX 40", country: "Germany", region: "EUROPE", ccy: "EUR", color: "#a78bfa",
+    level: 19412.80, dailyPct: -0.31, vol: 14.9, pe: 14.3, ytd: 11.3,
+    driver: "ECB rate cuts offset by Eurozone manufacturing headwinds",
+    insight: "Deep value discount (14.3x P/E) vs US; software & defense leaders carry index.",
+    ranges: {
+      "1M": [0.8, 1.3, 2.3, 22], "3M": [3.2, 1.9, 2.6, 24], "6M": [6.4, 2.5, 2.8, 26],
+      "1Y": [17.5, 3.4, 3.0, 30], "5Y": [48.0, 6.2, 3.2, 60]
+    }
+  },
+  {
+    code: "SENSEX", name: "BSE SENSEX", country: "India", region: "INDIA", ccy: "INR", color: "#ff7849",
+    level: 79842.30, dailyPct: 0.64, vol: 12.6, pe: 23.1, ytd: 14.8,
+    driver: "Domestic SIP liquidity & infrastructure capex cycle",
+    insight: "Lowest volatility among emerging peers; decoupled from European PMI slowdown.",
+    ranges: {
+      "1M": [1.9, 1.0, 3.1, 22], "3M": [4.9, 1.5, 3.4, 24], "6M": [10.8, 2.0, 3.7, 26],
+      "1Y": [21.6, 2.8, 4.0, 30], "5Y": [96.3, 5.4, 4.2, 60]
+    }
+  },
+  {
+    code: "FTSE", name: "FTSE 100", country: "United Kingdom", region: "EUROPE", ccy: "GBP", color: "#94a3b8",
+    level: 8245.10, dailyPct: 0.21, vol: 11.4, pe: 12.2, ytd: 7.4,
+    driver: "Commodity & global banking dividend yields",
+    insight: "Defensive income anchor lagging US growth by -14.4% YTD.",
+    ranges: {
+      "1M": [0.5, 0.9, 4.4, 22], "3M": [2.1, 1.2, 4.6, 24], "6M": [4.2, 1.7, 4.8, 26],
+      "1Y": [11.2, 2.3, 5.0, 30], "5Y": [26.8, 4.9, 5.1, 60]
+    }
+  }
+].map(idx => {
+  const series = {};
+  for (const [k, [ret, amp, phase, cnt]] of Object.entries(idx.ranges)) {
+    series[k] = buildSeries(idx.level, ret, amp, phase, cnt);
+  }
+  return { ...idx, series };
+});
+
+const STOCKS = [
+  { symbol: "NVDA", name: "NVIDIA Corporation", exchange: "NASDAQ", region: "US", ccy: "USD", sector: "AI Semiconductors", price: 141.80, dailyPct: 2.35, cap: "$3.47T", pe: 46.2, div: 0.03, beta: 1.65, studentScore: 76, adultScore: 94, studentVerdict: "High growth AI leader—allocate smaller position sizes via DCA due to higher swings.", adultVerdict: "Core AI infrastructure alpha pick; hyperscaler capex underpins EPS revisions.", spark: [128.0, 130.5, 132.1, 131.4, 135.8, 138.2, 139.0, 141.8], factors: { value: 54, momentum: 96, macro: 92, shield: 48 } },
+  { symbol: "MSFT", name: "Microsoft Corp.", exchange: "NASDAQ", region: "US", ccy: "USD", sector: "Enterprise AI & Cloud", price: 428.50, dailyPct: 0.85, cap: "$3.18T", pe: 33.8, div: 0.78, beta: 0.92, studentScore: 93, adultScore: 88, studentVerdict: "Ideal anchor stock for students: fortress balance sheet, steady cloud revenue, low drawdown.", adultVerdict: "Quality compounder with Azure AI monetization defending valuation across rate regimes.", spark: [412.0, 415.4, 418.0, 416.2, 421.5, 424.0, 426.3, 428.5], factors: { value: 71, momentum: 84, macro: 89, shield: 88 } },
+  { symbol: "AAPL", name: "Apple Inc.", exchange: "NASDAQ", region: "US", ccy: "USD", sector: "Consumer Ecosystem", price: 229.40, dailyPct: 0.54, cap: "$3.48T", pe: 32.1, div: 0.44, beta: 1.04, studentScore: 91, adultScore: 82, studentVerdict: "High brand loyalty & recurring Services cash flows make this a resilient beginner holding.", adultVerdict: "On-device AI upgrade cycle supports services ARPU while buybacks cushion dips.", spark: [221.0, 222.8, 224.0, 223.1, 225.7, 227.4, 228.1, 229.4], factors: { value: 68, momentum: 79, macro: 81, shield: 86 } },
+  { symbol: "TSM", name: "TSMC (ADR)", exchange: "NYSE", region: "US", ccy: "USD", sector: "Foundry Semiconductors", price: 194.20, dailyPct: 1.62, cap: "$1.01T", pe: 25.9, div: 1.32, beta: 1.24, studentScore: 82, adultScore: 92, studentVerdict: "Essential picks-and-shovels chip maker; diversify alongside US software.", adultVerdict: "Monopoly in 3nm/2nm nodes trades at discount to US fabless peers.", spark: [179.0, 182.0, 185.5, 184.0, 188.4, 190.1, 192.3, 194.2], factors: { value: 82, momentum: 91, macro: 88, shield: 67 } },
+  { symbol: "7203.T", name: "Toyota Motor Corp", exchange: "TSE", region: "APAC", ccy: "JPY", sector: "Hybrid Mobility", price: 19.65, dailyPct: 1.15, cap: "$264B", pe: 9.8, div: 2.85, beta: 0.78, studentScore: 87, adultScore: 86, studentVerdict: "Low P/E value leader with strong dividends—great international diversification.", adultVerdict: "Nikkei beneficiary of hybrid margins & Tokyo governance reforms.", spark: [18.5, 18.7, 18.9, 19.0, 19.2, 19.3, 19.5, 19.65], factors: { value: 92, momentum: 78, macro: 85, shield: 84 } },
+  { symbol: "6758.T", name: "Sony Group Corp", exchange: "TSE", region: "APAC", ccy: "JPY", sector: "Entertainment & Sensors", price: 20.40, dailyPct: 0.72, cap: "$124B", pe: 17.4, div: 0.65, beta: 0.94, studentScore: 85, adultScore: 84, studentVerdict: "Balanced Japanese tech & gaming giant; smooths semiconductor-heavy portfolios.", adultVerdict: "Music & gaming recurring IP cash flows insulate JPY cycles.", spark: [19.4, 19.6, 19.8, 19.9, 20.1, 20.0, 20.2, 20.4], factors: { value: 81, momentum: 76, macro: 80, shield: 81 } },
+  { symbol: "SAP.DE", name: "SAP SE", exchange: "XETRA", region: "EUROPE", ccy: "EUR", sector: "Enterprise Software", price: 236.90, dailyPct: 1.04, cap: "$278B", pe: 35.6, div: 0.98, beta: 0.89, studentScore: 84, adultScore: 90, studentVerdict: "Europe's flagship cloud software winner without industrial cyclicality.", adultVerdict: "DAX heavyweight decoupling from German manufacturing via S/4HANA backlog.", spark: [222.0, 225.5, 228.0, 229.1, 231.4, 233.0, 235.2, 236.9], factors: { value: 66, momentum: 90, macro: 84, shield: 83 } },
+  { symbol: "SIE.DE", name: "Siemens AG", exchange: "XETRA", region: "EUROPE", ccy: "EUR", sector: "Industrial Automation", price: 198.10, dailyPct: -0.48, cap: "$156B", pe: 17.8, div: 2.65, beta: 1.12, studentScore: 79, adultScore: 83, studentVerdict: "Solid European dividend payer linked to smart factories & power grids.", adultVerdict: "ECB easing + grid electrification backlog creates DAX mean-reversion entry.", spark: [201.0, 200.4, 199.8, 200.9, 199.5, 199.0, 198.7, 198.1], factors: { value: 84, momentum: 68, macro: 77, shield: 76 } },
+  { symbol: "RELIANCE.BO", name: "Reliance Industries", exchange: "BSE", region: "INDIA", ccy: "INR", sector: "Digital, Retail & Energy", price: 35.90, dailyPct: 0.96, cap: "$242B", pe: 26.8, div: 0.38, beta: 0.87, studentScore: 88, adultScore: 89, studentVerdict: "India's bellwether conglomerate spanning Jio telecom, retail & green energy.", adultVerdict: "BSE SENSEX anchor capturing domestic consumption & digital infrastructure.", spark: [34.1, 34.4, 34.8, 34.6, 35.1, 35.4, 35.6, 35.9], factors: { value: 74, momentum: 82, macro: 91, shield: 85 } },
+  { symbol: "TCS.BO", name: "Tata Consultancy Services", exchange: "BSE", region: "INDIA", ccy: "INR", sector: "IT Services & AI Consulting", price: 49.70, dailyPct: 0.42, cap: "$180B", pe: 29.4, div: 1.48, beta: 0.72, studentScore: 90, adultScore: 85, studentVerdict: "Low-beta Indian IT powerhouse with steady dividends for students.", adultVerdict: "Captures US enterprise AI spend in USD on an INR cost base.", spark: [48.2, 48.5, 48.7, 48.9, 49.1, 49.3, 49.5, 49.7], factors: { value: 76, momentum: 77, macro: 86, shield: 91 } }
+];
+
+const PREDICTIVE_ALERTS = [
+  { id: "vol_us_tech", title: "NDX / NVDA", region: "US Markets", regime: "Elevated Momentum", risk: 68, summary: "AI semiconductor implied volatility widens ahead of hyperscaler capex guidance.", action: "Student: Stagger SIP entries. Adult: Pair overweight beta with MSFT." },
+  { id: "vol_nikkei_fx", title: "N225 / 7203.T", region: "Japan (NIKKEI)", regime: "FX Divergence Watch", risk: 61, summary: "USD/JPY rate differentials create cross-currents between Tokyo exporters & banks.", action: "Accumulate governance-reform exporters on JPY pullbacks." },
+  { id: "vol_dax_ecb", title: "DAX / SAP.DE", region: "Germany (DAX)", regime: "Mean-Reversion Discount", risk: 44, summary: "DAX trades at a 43% P/E discount to S&P 500; ECB easing supports software capex.", action: "Rotate partial US gains into European quality compounders." },
+  { id: "vol_bse_sip", title: "SENSEX / RELIANCE.BO", region: "India (BSE)", regime: "Low-Vol Compounding", risk: 32, summary: "Domestic SIP inflows cushion global volatility on BSE blue-chips.", action: "Maintain core emerging-market allocation in Indian digital & IT leaders." }
+];
+
+// ==================== 2. PERSISTENT STATE ====================
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (_) {}
+  return {
+    tier: "student",
+    riskProfile: "moderate",
+    thresholdPct: 2.5,
+    notificationsEnabled: true,
+    compareRange: "1Y",
+    compareCodes: ["SPX", "N225", "DAX", "SENSEX"],
+    newsRegion: "GLOBAL",
+    watchlistFilter: "all",
+    scenarioExpr: "PORTFOLIO_AUDIT()",
+    holdings: [
+      { id: "h1", symbol: "NVDA", name: "NVIDIA Corporation", exchange: "NASDAQ", shares: 10, avgCost: 124.50 },
+      { id: "h2", symbol: "7203.T", name: "Toyota Motor Corp", exchange: "TSE", shares: 45, avgCost: 18.90 },
+      { id: "h3", symbol: "SAP.DE", name: "SAP SE", exchange: "XETRA", shares: 6, avgCost: 212.00 },
+      { id: "h4", symbol: "RELIANCE.BO", name: "Reliance Industries", exchange: "BSE", shares: 30, avgCost: 33.80 }
+    ],
+    alerts: [
+      { id: "a1", symbol: "NVDA", exchange: "NASDAQ", targetPct: 2.5, direction: "both", triggered: false, read: false, msg: "Monitoring +/- 2.5% intraday swing" }
+    ],
+    watchlist: [
+      { symbol: "NVDA", tag: "NONE", alertActive: false, confidence: 0, summary: "Pending correlation drift scan against NIKKEI, DAX & BSE." },
+      { symbol: "7203.T", tag: "NONE", alertActive: false, confidence: 0, summary: "Pending correlation drift scan against NIKKEI, DAX & BSE." },
+      { symbol: "SAP.DE", tag: "NONE", alertActive: false, confidence: 0, summary: "Pending correlation drift scan against NIKKEI, DAX & BSE." },
+      { symbol: "RELIANCE.BO", tag: "NONE", alertActive: false, confidence: 0, summary: "Pending correlation drift scan against NIKKEI, DAX & BSE." }
+    ],
+    savedReports: [],
+    auditHistory: []
+  };
+}
+
+let state = loadState();
+let currentTab = "pulse";
+let generatedNews = [];
+let aiDivergenceBrief = "";
+let hoveredPointIdx = null;
+
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (_) {}
+  const el = document.getElementById("topWatchCount");
+  if (el) el.textContent = state.watchlist.length;
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => t.classList.remove("show"), 3200);
+}
+
+// ==================== 3. CORRELATION & QUANT ENGINES ====================
+function seriesReturns(arr) {
+  const out = [];
+  for (let i = 1; i < arr.length; i++) {
+    const prev = Math.max(0.0001, arr[i - 1]);
+    out.push(((arr[i] - prev) / prev) * 100);
+  }
+  return out;
+}
+
+function pearsonCorrelation(a, b) {
+  const n = Math.min(a.length, b.length);
+  if (n < 2) return 0;
+  const x = a.slice(-n);
+  const y = b.slice(-n);
+  const mx = x.reduce((s, v) => s + v, 0) / n;
+  const my = y.reduce((s, v) => s + v, 0) / n;
+  let num = 0, sx = 0, sy = 0;
+  for (let i = 0; i < n; i++) {
+    const dx = x[i] - mx, dy = y[i] - my;
+    num += dx * dy;
+    sx += dx * dx;
+    sy += dy * dy;
+  }
+  const denom = Math.sqrt(sx * sy);
+  return denom < 1e-9 ? 0 : Math.max(-1, Math.min(1, num / denom));
+}
+
+function computeStockTelemetry(stock) {
+  const n225 = INDICES.find(i => i.code === "N225");
+  const dax = INDICES.find(i => i.code === "DAX");
+  const bse = INDICES.find(i => i.code === "SENSEX");
+  const spx = INDICES.find(i => i.code === "SPX");
+
+  const stRet = seriesReturns(stock.spark);
+  const n225Ret = seriesReturns(n225.series["1M"].map(p => p.level)).slice(-stRet.length);
+  const daxRet = seriesReturns(dax.series["1M"].map(p => p.level)).slice(-stRet.length);
+  const bseRet = seriesReturns(bse.series["1M"].map(p => p.level)).slice(-stRet.length);
+
+  const nikkeiCorr = pearsonCorrelation(stRet, n225Ret);
+  const daxCorr = pearsonCorrelation(stRet, daxRet);
+  const bseCorr = pearsonCorrelation(stRet, bseRet);
+
+  const primary = stock.region === "APAC" ? n225 : stock.region === "EUROPE" ? dax : stock.region === "INDIA" ? bse : spx;
+  const longBench = seriesReturns(primary.series["5Y"].map(p => p.level));
+  const seed = stock.symbol.split("").reduce((s, c) => s + c.charCodeAt(0), 0);
+  const prefixLen = Math.max(0, longBench.length - stRet.length);
+  const synthLong = [];
+  for (let i = 0; i < prefixLen; i++) {
+    synthLong.push(longBench[i] * stock.beta + Math.sin(i * 0.7 + seed) * 0.25);
+  }
+  const fullStock = synthLong.concat(stRet);
+  const longC = pearsonCorrelation(fullStock.slice(-59), longBench.slice(-59));
+  const shortC = pearsonCorrelation(fullStock.slice(-12), longBench.slice(-12));
+  const drift = longC - shortC;
+
+  let level = "ALIGNED";
+  if (drift > 0.45 || (shortC < 0 && longC > 0.4)) level = "DIVERGING";
+  else if (drift > 0.25) level = "WATCH";
+
+  const plainReason = level === "ALIGNED"
+    ? `${stock.symbol} is moving with ${primary.name} as usual.`
+    : level === "WATCH"
+      ? `${stock.symbol} has started to move differently from ${primary.name}. Keep an eye on it.`
+      : `${stock.symbol} is now moving very differently from ${primary.name}. Find out why before you invest.`;
+
+  const quantReason = `ρ(12d)=${shortC.toFixed(2)} vs ρ(59d)=${longC.toFixed(2)}, Δρ=${drift.toFixed(2)} vs ${primary.name}`;
+
+  const spreads = [
+    ["NIKKEI 225", stock.dailyPct - n225.dailyPct],
+    ["DAX 40", stock.dailyPct - dax.dailyPct],
+    ["BSE SENSEX", stock.dailyPct - bse.dailyPct]
+  ];
+  spreads.sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]));
+  const [domName, domSpread] = spreads[0];
+  const isRealTimeDiverging = level !== "ALIGNED" || Math.abs(domSpread) >= 1.35 || Math.abs(nikkeiCorr) < 0.35 || daxCorr < 0 || Math.abs(bseCorr) < 0.30;
+
+  return {
+    symbol: stock.symbol,
+    benchmarkName: primary.name,
+    shortCorr: shortC,
+    longCorr: longC,
+    drift,
+    level,
+    plainReason,
+    quantReason,
+    nikkeiCorr,
+    daxCorr,
+    bseCorr,
+    liveSpreadDeltaPct: domSpread,
+    dominantBenchmark: domName,
+    isRealTimeDiverging
+  };
+}
+
+function evaluateDiagnostics(exprRaw) {
+  const expr = (exprRaw || "PORTFOLIO_AUDIT()").trim();
+  const totalVal = state.holdings.reduce((s, h) => {
+    const st = STOCKS.find(x => x.symbol === h.symbol);
+    return s + h.shares * (st ? st.price : h.avgCost);
+  }, 0);
+  let weightedBeta = 1.04;
+  let topEx = "Unallocated";
+  let topPct = 0;
+  if (totalVal > 0) {
+    weightedBeta = state.holdings.reduce((s, h) => {
+      const st = STOCKS.find(x => x.symbol === h.symbol);
+      const val = h.shares * (st ? st.price : h.avgCost);
+      return s + (val / totalVal) * (st ? st.beta : 1.0);
+    }, 0);
+    const byEx = {};
+    state.holdings.forEach(h => {
+      const st = STOCKS.find(x => x.symbol === h.symbol);
+      byEx[h.exchange] = (byEx[h.exchange] || 0) + h.shares * (st ? st.price : h.avgCost);
+    });
+    for (const [k, v] of Object.entries(byEx)) {
+      const pct = (v / totalVal) * 100;
+      if (pct > topPct) { topPct = pct; topEx = k; }
+    }
+  }
+  const betaCap = state.riskProfile === "conservative" ? 1.05 : state.riskProfile === "moderate" ? 1.25 : 1.55;
+  const alertedSymbols = new Set(state.alerts.map(a => a.symbol));
+  const unguarded = state.holdings.filter(h => {
+    const st = STOCKS.find(x => x.symbol === h.symbol);
+    return st && st.beta > 1.2 && !alertedSymbols.has(h.symbol);
+  });
+
+  const ndx = INDICES.find(i => i.code === "NDX");
+  const dax = INDICES.find(i => i.code === "DAX");
+  const sensex = INDICES.find(i => i.code === "SENSEX");
+  const volSpread = ndx.vol - sensex.vol;
+  const peSpread = ndx.pe - dax.pe;
+
+  const metrics = [
+    { metric: "Weighted Portfolio Beta", result: `${weightedBeta.toFixed(2)} (Cap ${betaCap.toFixed(2)})`, status: weightedBeta > betaCap ? "ANOMALY" : "PASS" },
+    { metric: "Exchange Concentration", result: `${topEx} ${topPct.toFixed(1)}%`, status: topPct > 55 ? "ANOMALY" : topPct > 38 ? "DRIFT" : "PASS" },
+    { metric: "NDX–SENSEX Vol Spread", result: `+${volSpread.toFixed(1)}%`, status: volSpread > 5.0 ? "DRIFT" : "PASS" },
+    { metric: "US–DAX Valuation Gap", result: `+${peSpread.toFixed(1)}x P/E`, status: "DRIFT" },
+    { metric: "Unguarded High-Beta", result: `${unguarded.length} asset(s)`, status: unguarded.length > 0 ? "ANOMALY" : "PASS" }
+  ];
+
+  const anomalies = metrics.filter(m => m.status === "ANOMALY").length;
+  return { expr, totalVal, weightedBeta, topEx, topPct, unguarded, metrics, anomalies };
+}
+
+// ==================== 4. LIVE SIMULATION LOOP ====================
+setInterval(() => {
+  STOCKS.forEach(s => {
+    const d = (Math.random() - 0.48) * 0.42;
+    s.price = Math.max(1, s.price * (1 + d / 100));
+    s.dailyPct = Math.max(-12, Math.min(12, s.dailyPct + d * 0.65));
+    s.spark = s.spark.slice(1).concat(s.price);
+  });
+  INDICES.forEach(idx => {
+    const d = (Math.random() - 0.48) * 0.18;
+    idx.level = Math.max(100, idx.level * (1 + d / 100));
+    idx.dailyPct = Math.max(-8, Math.min(8, idx.dailyPct + d * 0.5));
+  });
+  renderCurrent();
+}, 4500);
+
+// ==================== 5. NAVIGATION & THEME ====================
+function toggleTheme() {
+  const html = document.documentElement;
+  const next = html.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  html.setAttribute("data-theme", next);
+  renderCurrent();
+}
+
+function setTier(tier) {
+  state.tier = tier;
+  document.getElementById("pillStudent").className = "tier-pill" + (tier === "student" ? " active-student" : "");
+  document.getElementById("pillAdult").className = "tier-pill" + (tier === "adult" ? " active-adult" : "");
+  saveState();
+  renderCurrent();
+  showToast(`Switched to ${tier === "student" ? "Student Scholar (gemini-3.5-flash-lite)" : "Adult Quant Pro (gemini-3.8-flash)"}`);
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll("[data-tab]").forEach(b => {
+    b.classList.toggle("active", b.getAttribute("data-tab") === tab);
+  });
+  renderCurrent();
+}
+
+function sparkSvg(points, color) {
+  if (!points || points.length < 2) return "";
+  const min = Math.min(...points), max = Math.max(...points);
+  const span = Math.max(0.0001, max - min);
+  const w = 78, h = 28;
+  const coords = points.map((v, i) => {
+    const x = (i / (points.length - 1)) * w;
+    const y = h - 3 - ((v - min) / span) * (h - 6);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(" ");
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" points="${coords}"/></svg>`;
+}
+
+// ==================== 6. VIEW RENDERERS ====================
+function renderCurrent() {
+  saveState();
+  const root = document.getElementById("mainContent");
+  if (currentTab === "pulse") renderPulse(root);
+  else if (currentTab === "compare") renderCompare(root);
+  else if (currentTab === "picks") renderPicks(root);
+  else if (currentTab === "watchlist") renderWatchlist(root);
+  else if (currentTab === "portfolio") renderPortfolio(root);
+  else if (currentTab === "diagnostics") renderDiagnostics(root);
+  else if (currentTab === "plans") renderPlans(root);
+}
+
+function renderPulse(root) {
+  const isStudent = state.tier === "student";
+  const totalVal = state.holdings.reduce((s, h) => s + h.shares * (STOCKS.find(x => x.symbol === h.symbol)?.price || h.avgCost), 0);
+  const totalCost = state.holdings.reduce((s, h) => s + h.shares * h.avgCost, 0);
+  const gain = totalVal - totalCost;
+  const gainPct = totalCost > 0 ? (gain / totalCost) * 100 : 0;
+
+  const ranked = [...STOCKS].sort((a, b) => isStudent ? b.studentScore - a.studentScore : b.adultScore - a.adultScore).slice(0, 4);
+  const watchDivCount = state.watchlist.filter(w => {
+    const st = STOCKS.find(s => s.symbol === w.symbol);
+    return w.alertActive || (st && computeStockTelemetry(st).isRealTimeDiverging);
+  }).length;
+
+  root.innerHTML = `
+    <section class="hero-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <span class="badge ${isStudent ? "badge-cyan" : "badge-gold"}">
+          ${isStudent ? "Student Scholar • gemini-3.5-flash-lite" : "Adult Quant Pro • gemini-3.8-flash"}
+        </span>
+        <span class="badge badge-neutral" style="background:rgba(255,255,255,0.1);color:#fff;border-color:rgba(255,255,255,0.18);cursor:pointer;" onclick="switchTab('portfolio')">
+          🔔 ${state.alerts.filter(a => a.triggered && !a.read).length} Live Alerts
+        </span>
+      </div>
+      <div>
+        <div style="font-size:13px;color:#cbd5e1;">Real-Time Global Portfolio Valuation</div>
+        <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;">
+          <div class="hero-value mono">$${totalVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+          <div class="${gain >= 0 ? "pos" : "neg"} mono" style="font-weight:700;font-size:17px;">${gain >= 0 ? "+" : ""}${gainPct.toFixed(2)}%</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="switchTab('picks')">✨ AI News-to-Share Picks</button>
+        <button class="btn btn-secondary" style="background:rgba(255,255,255,0.12);color:#fff;border-color:rgba(255,255,255,0.2);" onclick="switchTab('compare')">🌐 Global Divergence Lab</button>
+      </div>
+    </section>
+
+    <div class="grid-2">
+      <div class="card" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="switchTab('watchlist')">
+        <div>
+          <div style="font-weight:700;">📡 AI Smart Watchlist</div>
+          <div style="font-size:13px;color:var(--muted);">${state.watchlist.length} tracked • ${watchDivCount} NIKKEI/DAX/BSE divergence alert(s)</div>
+        </div>
+        <span class="badge badge-gold">Open →</span>
+      </div>
+      <div class="card" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="switchTab('diagnostics')">
+        <div>
+          <div style="font-weight:700;">🧪 Quant Strategy Audit Lab</div>
+          <div style="font-size:13px;color:var(--muted);">What-If script trace, beta exposure &amp; anomaly metrics</div>
+        </div>
+        <span class="badge badge-cyan">Run Audit →</span>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <h2>Global Exchange Pulse</h2>
+      <button class="btn btn-secondary btn-sm" onclick="switchTab('compare')">Compare US / NIKKEI / DAX / BSE →</button>
+    </div>
+
+    <div class="ticker-strip">
+      ${INDICES.map(idx => `
+        <div class="card" style="padding:14px;cursor:pointer;" onclick="switchTab('compare')">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong style="font-size:14px;">${idx.name}</strong>
+            <span style="width:9px;height:9px;border-radius:50%;background:${idx.color};"></span>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">${idx.country}</div>
+          ${sparkSvg(idx.series["1M"].map(p => p.level), idx.dailyPct >= 0 ? "#00d09c" : "#ff5a65")}
+          <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:12px;" class="mono">
+            <strong>${idx.level.toLocaleString(undefined, { maximumFractionDigits: 0 })}</strong>
+            <span class="${idx.dailyPct >= 0 ? "pos" : "neg"}">${idx.dailyPct >= 0 ? "+" : ""}${idx.dailyPct.toFixed(2)}%</span>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+
+    <h2>Predictive Volatility Radar</h2>
+    <div class="grid-2">
+      ${PREDICTIVE_ALERTS.map(a => `
+        <div class="card" style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong>${a.title} • <span style="color:var(--muted);font-weight:500;">${a.region}</span></strong>
+            <span class="badge ${a.risk >= 60 ? "badge-crimson" : "badge-emerald"}">Vol Risk ${a.risk}%</span>
+          </div>
+          <div style="font-size:12px;color:var(--gold);font-weight:700;">${a.regime}</div>
+          <div style="font-size:13px;color:var(--muted);">${a.summary}</div>
+          <div style="font-size:12px;color:var(--emerald);font-weight:600;">${a.action}</div>
+        </div>
+      `).join("")}
+    </div>
+
+    <div class="section-head">
+      <div>
+        <h2>Top Share Picks (${isStudent ? "Student Scholar" : "Adult Quant Pro"})</h2>
+        <div style="font-size:13px;color:var(--muted);">${isStudent ? "Ranked for stability, steady compounding & low drawdown" : "Ranked by institutional multi-factor Alpha score"}</div>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="switchTab('picks')">View All Picks</button>
+    </div>
+
+    <div class="grid-2">
+      ${ranked.map(s => {
+        const sc = isStudent ? s.studentScore : s.adultScore;
+        const vd = isStudent ? s.studentVerdict : s.adultVerdict;
+        return `
+          <div class="card" style="display:flex;justify-content:space-between;gap:12px;cursor:pointer;" onclick="openStockModal('${s.symbol}')">
+            <div style="display:flex;gap:12px;align-items:center;">
+              <div style="width:46px;height:46px;border-radius:12px;background:var(--emerald-dim);color:var(--emerald);display:grid;place-items:center;font-weight:800;" class="mono">${sc}</div>
+              <div>
+                <div style="font-weight:700;">${s.symbol} <span style="font-size:12px;color:var(--muted);">${s.exchange}</span></div>
+                <div style="font-size:12px;color:var(--muted);">${vd}</div>
+              </div>
+            </div>
+            <div style="text-align:right;white-space:nowrap;" class="mono">
+              <div style="font-weight:700;">$${s.price.toFixed(2)}</div>
+              <div class="${s.dailyPct >= 0 ? "pos" : "neg"}" style="font-size:12px;">${s.dailyPct >= 0 ? "+" : ""}${s.dailyPct.toFixed(2)}%</div>
+            </div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+function renderCompare(root) {
+  root.innerHTML = `
+    <div>
+      <h1>Global Exchange Divergence</h1>
+      <div style="color:var(--muted);font-size:14px;">Compare historical returns, P/E multiples &amp; volatility across US, NIKKEI 225, DAX 40, BSE SENSEX &amp; FTSE 100.</div>
+    </div>
+
+    <div class="chips-row">
+      ${INDICES.map(idx => {
+        const active = state.compareCodes.includes(idx.code);
+        return `<button class="chip ${active ? "selected" : ""}" onclick="toggleCompareCode('${idx.code}')">
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${idx.color};margin-right:6px;"></span>${idx.name}
+        </button>`;
+      }).join("")}
+    </div>
+
+    <div class="card">
+      <div class="section-head">
+        <strong>Historical Return Overlay (% Normalized)</strong>
+        <div class="chips-row">
+          ${["1M", "3M", "6M", "1Y", "5Y"].map(r => `
+            <button class="chip ${state.compareRange === r ? "selected" : ""}" onclick="setCompareRange('${r}')">${r}</button>
+          `).join("")}
+        </div>
+      </div>
+      <div class="chart-box"><canvas id="divergenceCanvas"></canvas></div>
+      <div id="chartHoverInfo" style="font-size:12px;color:var(--muted);margin-top:8px;">Hover or tap across the chart to inspect exact cross-exchange return spreads.</div>
+    </div>
+
+    <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+      <div class="section-head">
+        <strong>Cross-Exchange Divergence Brief</strong>
+        <button class="btn btn-primary btn-sm" onclick="runDivergenceBrief()">✨ Synthesize Divergence Forecast</button>
+      </div>
+      ${aiDivergenceBrief ? `<div style="background:var(--surface-elevated);padding:12px;border-radius:12px;font-size:13px;white-space:pre-line;">${aiDivergenceBrief}</div>` : `<div style="font-size:13px;color:var(--muted);">Generate a tier-calibrated divergence &amp; valuation spread brief across US, NIKKEI, DAX, and BSE.</div>`}
+    </div>
+
+    <div class="grid-2">
+      ${INDICES.map(idx => `
+        <div class="card" style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <strong>${idx.name} (${idx.country})</strong>
+            <span class="${idx.dailyPct >= 0 ? "pos" : "neg"} mono" style="font-weight:700;">${idx.dailyPct >= 0 ? "+" : ""}${idx.dailyPct.toFixed(2)}%</span>
+          </div>
+          <div class="chips-row">
+            <span class="badge badge-neutral">YTD +${idx.ytd}%</span>
+            <span class="badge badge-neutral">P/E ${idx.pe}x</span>
+            <span class="badge badge-neutral">Vol ${idx.vol}%</span>
+            <span class="badge badge-neutral">${idx.ccy}</span>
+          </div>
+          <div style="font-size:13px;"><strong>Macro:</strong> ${idx.driver}</div>
+          <div style="font-size:12px;color:var(--muted);">Divergence: ${idx.insight}</div>
+        </div>
+      `).join("")}
+    </div>
+  `;
+  drawDivergenceChart();
+}
+
+function drawDivergenceChart() {
+  const canvas = document.getElementById("divergenceCanvas");
+  if (!canvas) return;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.max(300, rect.width * dpr);
+  canvas.height = 260 * dpr;
+  const ctx = canvas.getContext("2d");
+  ctx.scale(dpr, dpr);
+  const w = rect.width, h = 260;
+  ctx.clearRect(0, 0, w, h);
+
+  const active = INDICES.filter(i => state.compareCodes.includes(i.code));
+  if (!active.length) return;
+  const allVals = active.flatMap(i => i.series[state.compareRange].map(p => p.normPct));
+  const min = Math.min(...allVals, 0), max = Math.max(...allVals, 1);
+  const span = Math.max(1, max - min);
+  const padL = 42, padR = 14, padT = 16, padB = 26;
+  const cw = w - padL - padR, ch = h - padT - padB;
+
+  ctx.strokeStyle = "rgba(148,163,184,0.18)";
+  ctx.lineWidth = 1;
+  for (let g = 0; g <= 4; g++) {
+    const y = padT + (ch * g) / 4;
+    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(w - padR, y); ctx.stroke();
+    const val = max - (span * g) / 4;
+    ctx.fillStyle = "#94a3b8";
+    ctx.font = "11px JetBrains Mono, monospace";
+    ctx.fillText(val.toFixed(0) + "%", 4, y + 4);
+  }
+
+  active.forEach(idx => {
+    const pts = idx.series[state.compareRange];
+    ctx.strokeStyle = idx.color;
+    ctx.lineWidth = 2.4;
+    ctx.beginPath();
+    pts.forEach((p, i) => {
+      const x = padL + (i / (pts.length - 1)) * cw;
+      const y = padT + ch - ((p.normPct - min) / span) * ch;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+  });
+
+  if (hoveredPointIdx !== null) {
+    const ptsCount = active[0].series[state.compareRange].length;
+    const clamped = Math.max(0, Math.min(ptsCount - 1, hoveredPointIdx));
+    const hx = padL + (clamped / (ptsCount - 1)) * cw;
+    ctx.strokeStyle = "rgba(248,250,252,0.45)";
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(hx, padT); ctx.lineTo(hx, h - padB); ctx.stroke();
+    ctx.setLineDash([]);
+    const info = active.map(idx => `${idx.code}: ${idx.series[state.compareRange][clamped].normPct.toFixed(1)}%`).join("  •  ");
+    const infoEl = document.getElementById("chartHoverInfo");
+    if (infoEl) infoEl.textContent = info;
+  }
+
+  canvas.onmousemove = (e) => {
+    const r = canvas.getBoundingClientRect();
+    const rel = Math.max(0, Math.min(1, (e.clientX - r.left - padL) / cw));
+    hoveredPointIdx = Math.round(rel * (active[0].series[state.compareRange].length - 1));
+    drawDivergenceChart();
+  };
+}
+
+function renderPicks(root) {
+  const isStudent = state.tier === "student";
+  const regions = ["GLOBAL", "US", "APAC", "EUROPE", "INDIA"];
+  const list = STOCKS.filter(s => state.newsRegion === "GLOBAL" || s.region === state.newsRegion)
+    .sort((a, b) => isStudent ? b.studentScore - a.studentScore : b.adultScore - a.adultScore);
+
+  root.innerHTML = `
+    <div>
+      <h1>AI News &amp; Share Picker</h1>
+      <div style="color:var(--muted);font-size:14px;">Translates international macro headlines &amp; exchange spreads into ranked share picks.</div>
+    </div>
+
+    <div class="chips-row">
+      ${regions.map(r => `<button class="chip ${state.newsRegion === r ? "selected" : ""}" onclick="state.newsRegion='${r}';renderCurrent();">${r}</button>`).join("")}
+    </div>
+
+    <div class="card" style="display:flex;flex-direction:column;gap:12px;">
+      <div class="section-head">
+        <div>
+          <strong>International Macro Catalyst Synthesizer</strong>
+          <div style="font-size:12px;color:var(--muted);">Model: ${isStudent ? "gemini-3.5-flash-lite (Student)" : "gemini-3.8-flash (Adult Pro)"}</div>
+        </div>
+        <button class="btn btn-primary" onclick="runNewsSynthesis()">✨ Analyze ${state.newsRegion} News &amp; Pick Shares</button>
+      </div>
+      ${generatedNews.length ? `
+        <div class="grid-3">
+          ${generatedNews.map((n, idx) => `
+            <div style="background:var(--surface-elevated);padding:14px;border-radius:16px;border:1px solid var(--outline);display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span class="badge badge-emerald">${n.signal} ${n.ticker} • ${n.confidence}%</span>
+                <span style="font-size:11px;color:var(--muted);">${n.region}</span>
+              </div>
+              <strong style="font-size:14px;">${n.headline}</strong>
+              <div style="font-size:12px;color:var(--muted);">${n.macroImpact}</div>
+              <div style="font-size:12px;color:var(--cyan);">${n.divergenceEffect}</div>
+              <div style="font-size:12px;">${n.rationale}</div>
+              <button class="btn btn-secondary btn-sm" onclick="saveNewsPick(${idx})">Save to Archive</button>
+            </div>
+          `).join("")}
+        </div>
+      ` : `<div style="font-size:13px;color:var(--muted);">Tap Analyze above to map live US, NIKKEI, DAX, and BSE catalysts into actionable equity picks.</div>`}
+    </div>
+
+    <h2>Screened Equities (${state.newsRegion})</h2>
+    <div class="grid-2">
+      ${list.map(s => {
+        const sc = isStudent ? s.studentScore : s.adultScore;
+        const watched = state.watchlist.some(w => w.symbol === s.symbol);
+        return `
+          <div class="card" style="display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+              <div>
+                <div style="font-weight:700;font-size:16px;">${s.symbol} <span class="badge badge-neutral">${s.exchange}</span></div>
+                <div style="font-size:12px;color:var(--muted);">${s.name} • ${s.cap}</div>
+              </div>
+              ${sparkSvg(s.spark, s.dailyPct >= 0 ? "#00d09c" : "#ff5a65")}
+              <div style="text-align:right;" class="mono">
+                <strong>$${s.price.toFixed(2)}</strong>
+                <div class="${s.dailyPct >= 0 ? "pos" : "neg"}" style="font-size:12px;">${s.dailyPct >= 0 ? "+" : ""}${s.dailyPct.toFixed(2)}%</div>
+              </div>
+            </div>
+            <div class="factor-grid">
+              ${[["Value", s.factors.value], ["Momentum", s.factors.momentum], ["Macro", s.factors.macro], ["Shield", s.factors.shield]].map(([lbl, val]) => `
+                <div class="factor-box">
+                  <div style="display:flex;justify-content:space-between;font-size:11px;"><span>${lbl}</span><strong class="mono">${val}</strong></div>
+                  <div class="bar-track"><div class="bar-fill" style="width:${val}%"></div></div>
+                </div>
+              `).join("")}
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="openStockModal('${s.symbol}')">Thesis (${sc})</button>
+              <button class="btn btn-primary btn-sm" style="flex:1;" onclick="quickAddHolding('${s.symbol}')">+ Track 5 sh</button>
+              <button class="btn btn-secondary btn-sm" onclick="toggleWatchlist('${s.symbol}')">${watched ? "★" : "☆"}</button>
+            </div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+
+    ${state.savedReports.length ? `
+      <h2>Saved Advisory Briefs</h2>
+      <div class="grid-2">
+        ${state.savedReports.map(r => `
+          <div class="card" style="display:flex;justify-content:space-between;gap:10px;">
+            <div>
+              <span class="badge badge-cyan">${r.signal} ${r.ticker} • ${r.tier.toUpperCase()}</span>
+              <div style="font-weight:700;margin-top:6px;">${r.headline}</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:4px;">${r.rationale}</div>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="deleteSavedReport('${r.id}')">✕</button>
+          </div>
+        `).join("")}
+      </div>
+    ` : ""}
+  `;
+}
+
+function renderWatchlist(root) {
+  const isAdult = state.tier === "adult";
+  const rows = state.watchlist.map(w => {
+    const stock = STOCKS.find(s => s.symbol === w.symbol);
+    const tel = stock ? computeStockTelemetry(stock) : null;
+    return { w, stock, tel };
+  });
+
+  const divCount = rows.filter(r => r.w.alertActive || (r.tel && r.tel.isRealTimeDiverging)).length;
+  const filtered = (state.watchlistFilter === "alerts"
+    ? rows.filter(r => r.w.alertActive || (r.tel && r.tel.isRealTimeDiverging))
+    : rows
+  ).sort((a, b) => {
+    if (a.w.alertActive !== b.w.alertActive) return a.w.alertActive ? -1 : 1;
+    return Math.abs(b.tel?.drift || 0) - Math.abs(a.tel?.drift || 0);
+  });
+
+  const benches = INDICES.filter(i => ["N225", "DAX", "SENSEX"].includes(i.code));
+
+  root.innerHTML = `
+    <div class="section-head">
+      <div>
+        <h1>AI Smart Watchlist</h1>
+        <div style="color:var(--muted);font-size:14px;">Real-time NIKKEI 225, DAX 40 &amp; BSE SENSEX correlation drift &amp; divergence radar.</div>
+      </div>
+      <button class="btn btn-primary" onclick="openTrackWatchlistModal()">+ Track Asset</button>
+    </div>
+
+    <div class="card" style="display:flex;flex-direction:column;gap:12px;">
+      <div class="section-head">
+        <strong>Historical Correlation Engine (${isAdult ? "Adult Quant Pro" : "Student Scholar"})</strong>
+        <span class="badge ${divCount > 0 ? "badge-gold" : "badge-emerald"}">${divCount} Divergence</span>
+      </div>
+      <div class="grid-3">
+        ${benches.map(b => `
+          <div style="background:var(--surface-elevated);padding:10px;border-radius:12px;text-align:center;">
+            <div style="font-size:12px;color:var(--muted);">${b.name}</div>
+            <div class="${b.dailyPct >= 0 ? "pos" : "neg"} mono" style="font-weight:700;">${b.dailyPct >= 0 ? "+" : ""}${b.dailyPct.toFixed(2)}%</div>
+          </div>
+        `).join("")}
+      </div>
+      <button class="btn btn-primary" onclick="scanWatchlistDivergence()">✨ AI Tag Divergence Alerts</button>
+    </div>
+
+    <div class="chips-row">
+      <button class="chip ${state.watchlistFilter === "all" ? "selected" : ""}" onclick="state.watchlistFilter='all';renderCurrent();">All Watched (${rows.length})</button>
+      <button class="chip ${state.watchlistFilter === "alerts" ? "selected" : ""}" onclick="state.watchlistFilter='alerts';renderCurrent();">Divergence Alerts (${divCount})</button>
+    </div>
+
+    ${filtered.length === 0 ? `
+      <div class="card" style="text-align:center;padding:28px;">
+        <strong>No watched equities matching filter</strong>
+        <div style="color:var(--muted);font-size:13px;margin:8px 0 14px;">Load the multi-exchange starter watchlist or add any stock from US, TSE, XETRA, or BSE.</div>
+        <button class="btn btn-primary" onclick="loadStarterWatchlist()">Load Starter Watchlist</button>
+      </div>
+    ` : `
+      <div class="grid-2">
+        ${filtered.map(({ w, stock, tel }) => {
+          const levelBadge = !tel ? "badge-neutral" : tel.level === "DIVERGING" ? "badge-crimson" : tel.level === "WATCH" ? "badge-gold" : "badge-emerald";
+          const tagLabel = w.tag !== "NONE" ? `${w.tag.replace(/_/g, " ")} • ${w.confidence}%` : (tel?.isRealTimeDiverging ? "LIVE SPREAD DIVERGENCE" : "CORRELATION ALIGNED");
+          return `
+            <div class="card" style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                <div>
+                  <div style="font-weight:700;">${w.symbol} <span class="badge badge-neutral">${stock?.exchange || ""}</span></div>
+                  <div style="font-size:12px;color:var(--muted);">${stock?.name || ""}</div>
+                </div>
+                ${stock ? `<div style="text-align:right;" class="mono"><strong>$${stock.price.toFixed(2)}</strong><div class="${stock.dailyPct >= 0 ? "pos" : "neg"}" style="font-size:12px;">${stock.dailyPct >= 0 ? "+" : ""}${stock.dailyPct.toFixed(2)}%</div></div>` : ""}
+                <button class="btn btn-secondary btn-sm" onclick="toggleWatchlist('${w.symbol}')">✕</button>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <span class="badge ${w.alertActive ? "badge-gold" : "badge-cyan"}">${tagLabel}</span>
+                ${tel ? `<span class="badge ${levelBadge}">${tel.level}</span>` : ""}
+              </div>
+              ${tel ? `
+                <div style="font-size:13px;font-weight:600;">${isAdult ? tel.quantReason : tel.plainReason}</div>
+                <div style="display:flex;justify-content:space-between;background:var(--surface-elevated);padding:10px;border-radius:12px;font-size:12px;" class="mono">
+                  <div><div style="color:var(--muted);font-size:10px;">N225 r</div><strong>${tel.nikkeiCorr.toFixed(2)}</strong></div>
+                  <div><div style="color:var(--muted);font-size:10px;">DAX r</div><strong>${tel.daxCorr.toFixed(2)}</strong></div>
+                  <div><div style="color:var(--muted);font-size:10px;">BSE r</div><strong>${tel.bseCorr.toFixed(2)}</strong></div>
+                  <div style="text-align:right;"><div style="color:var(--muted);font-size:10px;">Spread</div><strong class="${tel.isRealTimeDiverging ? "warn" : "pos"}">${tel.liveSpreadDeltaPct >= 0 ? "+" : ""}${tel.liveSpreadDeltaPct.toFixed(2)}%</strong></div>
+                </div>
+              ` : ""}
+              <div style="font-size:12px;color:var(--muted);">${w.summary}</div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="openStockModal('${w.symbol}')">AI Deep Dive</button>
+                <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="createHedgeAlert('${w.symbol}')">Alert +/-2.5%</button>
+              </div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    `}
+    <div style="font-size:12px;color:var(--muted);padding-top:4px;">Educational analysis only, not investment advice.</div>
+  `;
+}
+
+function renderPortfolio(root) {
+  const totalVal = state.holdings.reduce((s, h) => s + h.shares * (STOCKS.find(x => x.symbol === h.symbol)?.price || h.avgCost), 0);
+  const totalCost = state.holdings.reduce((s, h) => s + h.shares * h.avgCost, 0);
+  const pnl = totalVal - totalCost;
+
+  root.innerHTML = `
+    <div class="section-head">
+      <div>
+        <h1>Portfolio &amp; Price Alerts</h1>
+        <div style="color:var(--muted);font-size:14px;">Real-time valuation, multi-exchange holdings &amp; volatility notifications.</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-secondary btn-sm" onclick="openAddAlertModal()">+ Alert</button>
+        <button class="btn btn-primary btn-sm" onclick="openAddHoldingModal()">+ Asset</button>
+      </div>
+    </div>
+
+    <div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <div>
+        <div style="font-size:12px;color:var(--muted);">Live Market Value</div>
+        <div class="display-font mono" style="font-size:30px;font-weight:800;">$${totalVal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+      </div>
+      <span class="badge ${pnl >= 0 ? "badge-emerald" : "badge-crimson"} mono">${pnl >= 0 ? "+" : ""}$${pnl.toFixed(2)} Total P&amp;L</span>
+    </div>
+
+    <div class="grid-2">
+      ${state.holdings.map(h => {
+        const live = STOCKS.find(s => s.symbol === h.symbol)?.price || h.avgCost;
+        const val = h.shares * live;
+        const posPnl = (live - h.avgCost) * h.shares;
+        return `
+          <div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+            <div>
+              <strong>${h.symbol} <span class="badge badge-neutral">${h.exchange}</span></strong>
+              <div style="font-size:12px;color:var(--muted);margin-top:4px;" class="mono">${h.shares} sh • Avg $${h.avgCost.toFixed(2)} • Live $${live.toFixed(2)}</div>
+            </div>
+            <div style="text-align:right;" class="mono">
+              <strong>$${val.toFixed(2)}</strong>
+              <div class="${posPnl >= 0 ? "pos" : "neg"}" style="font-size:12px;">${posPnl >= 0 ? "+" : ""}$${posPnl.toFixed(2)}</div>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="deleteHolding('${h.id}')">✕</button>
+          </div>
+        `;
+      }).join("")}
+    </div>
+
+    <div class="section-head">
+      <h2>Personalized Price Alerts</h2>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-gold btn-sm" onclick="simulateAlertMove()">⚡ Simulate Price Alert</button>
+        <button class="btn btn-secondary btn-sm" onclick="switchTab('diagnostics')">🧪 Open Audit Lab</button>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      ${state.alerts.map(a => `
+        <div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+          <div>
+            <span class="badge ${a.triggered ? "badge-gold" : "badge-cyan"}">${a.symbol} • ${a.triggered ? "TRIGGERED" : `+/- ${a.targetPct}%`}</span>
+            <div style="font-size:13px;margin-top:6px;">${a.msg}</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="deleteAlert('${a.id}')">✕</button>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderDiagnostics(root) {
+  const d = evaluateDiagnostics(state.scenarioExpr);
+  const presets = [
+    ["Audit Current Portfolio", "PORTFOLIO_AUDIT()"],
+    ["VIX Spike > 22", "VIX > 22 && BETA > 1.2"],
+    ["BOJ Hawkish Shift", "BOJ_HIKE && JPY < 150"],
+    ["ECB Rate Cut & DAX Value", "ECB -25BPS && DAX_PE < 16"]
+  ];
+
+  root.innerHTML = `
+    <div class="section-head">
+      <div>
+        <h1>Quant Strategy Audit Lab</h1>
+        <div style="color:var(--muted);font-size:14px;">What-if macro script sandbox, execution trace &amp; anomaly metrics.</div>
+      </div>
+      <span class="badge ${d.anomalies > 0 ? "badge-crimson" : "badge-emerald"}">${d.anomalies} Flags</span>
+    </div>
+
+    <div class="card" style="display:flex;flex-direction:column;gap:12px;">
+      <div class="chips-row">
+        ${presets.map(([lbl, expr]) => `<button class="chip ${state.scenarioExpr === expr ? "selected" : ""}" onclick="runDiagnosticExpr('${expr}')">${lbl}</button>`).join("")}
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <input id="diagInput" type="text" class="mono" value="${d.expr}" style="flex:1;min-width:220px;" />
+        <button class="btn btn-primary" onclick="runDiagnosticExpr(document.getElementById('diagInput').value)">▶ Run Trace</button>
+      </div>
+      <div class="mono" style="font-size:12px;color:var(--cyan);background:var(--surface-elevated);padding:10px;border-radius:10px;">
+        context:///${state.tier}/${state.riskProfile} | script:///${d.expr}
+      </div>
+    </div>
+
+    <div class="card">
+      <strong style="display:block;margin-bottom:10px;">Diagnostic Metric Table</strong>
+      <table>
+        <thead><tr><th>Metric</th><th>Result</th><th>Status</th></tr></thead>
+        <tbody>
+          ${d.metrics.map(m => `
+            <tr>
+              <td>${m.metric}</td>
+              <td class="mono">${m.result}</td>
+              <td><span class="badge ${m.status === "ANOMALY" ? "badge-crimson" : m.status === "DRIFT" ? "badge-gold" : "badge-emerald"}">${m.status}</span></td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+
+    ${d.unguarded.length ? `
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div>
+          <strong>Actionable Finding: Unhedged High-Beta Position (${d.unguarded[0].symbol})</strong>
+          <div style="font-size:13px;color:var(--muted);">${d.unguarded[0].symbol} exceeds 1.20 beta without an active +/-2.5% volatility trigger.</div>
+        </div>
+        <button class="btn btn-gold btn-sm" onclick="createHedgeAlert('${d.unguarded[0].symbol}')">Create 2.5% Hedge Alert</button>
+      </div>
+    ` : ""}
+  `;
+}
+
+function renderPlans(root) {
+  const isStudent = state.tier === "student";
+  root.innerHTML = `
+    <div>
+      <h1>D2C Subscription Plans</h1>
+      <div style="color:var(--muted);font-size:14px;">Segmented AI consultancy tiers for Student vs. Adult Quant investors.</div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card" style="border-color:${isStudent ? "var(--cyan)" : "var(--outline)"};display:flex;flex-direction:column;gap:10px;">
+        <div class="section-head">
+          <h3>Student Scholar</h3>
+          <span class="badge badge-cyan">$4.99/mo</span>
+        </div>
+        <div style="font-size:12px;color:var(--cyan);font-weight:700;">AI Engine: gemini-3.5-flash-lite</div>
+        <div style="font-size:13px;color:var(--muted);">Plain-English international news impact, educational SIP pacing, and beginner divergence guardrails.</div>
+        <button class="btn ${isStudent ? "btn-secondary" : "btn-primary"}" onclick="setTier('student')">${isStudent ? "Active Plan" : "Switch to Student Scholar"}</button>
+      </div>
+
+      <div class="card" style="border-color:${!isStudent ? "var(--gold)" : "var(--outline)"};display:flex;flex-direction:column;gap:10px;">
+        <div class="section-head">
+          <h3>Adult Quant Pro</h3>
+          <span class="badge badge-gold">$19.99/mo</span>
+        </div>
+        <div style="font-size:12px;color:var(--gold);font-weight:700;">AI Engine: gemini-3.8-flash</div>
+        <div style="font-size:13px;color:var(--muted);">Institutional correlation telemetry (Δρ), cross-border FX/valuation divergence, and factor alpha rankings.</div>
+        <button class="btn ${!isStudent ? "btn-secondary" : "btn-gold"}" onclick="setTier('adult')">${!isStudent ? "Active Plan" : "Switch to Adult Quant Pro"}</button>
+      </div>
+    </div>
+
+    <div class="card" style="display:flex;flex-direction:column;gap:12px;">
+      <strong>Advisory Risk &amp; Alert Preferences</strong>
+      <div class="chips-row">
+        ${[["conservative", "Conservative"], ["moderate", "Moderate"], ["growth", "Growth Alpha"]].map(([id, lbl]) => `
+          <button class="chip ${state.riskProfile === id ? "selected" : ""}" onclick="state.riskProfile='${id}';renderCurrent();showToast('Updated risk profile to ${lbl}');">${lbl}</button>
+        `).join("")}
+      </div>
+      <div>
+        <label style="font-size:13px;">Volatility Alert Threshold: <strong class="mono">${state.thresholdPct}%</strong></label>
+        <input type="range" min="0.5" max="10" step="0.5" value="${state.thresholdPct}" oninput="state.thresholdPct=parseFloat(this.value);renderCurrent();" style="width:100%;margin-top:6px;">
+      </div>
+    </div>
+
+    <div class="card" style="background:var(--surface-elevated);">
+      <strong style="display:block;margin-bottom:6px;">FinAdvisor MBA Entrepreneurship Business Model</strong>
+      <div style="font-size:13px;color:var(--muted);">
+        • Tiered AI Routing: High-volume student literacy runs on Flash-Lite ($4.99/mo); institutional cross-market alpha runs on Gemini 3.8 Flash ($19.99/mo).<br>
+        • Global Wedge: Bridges US equities with NIKKEI 225, DAX 40 &amp; BSE SENSEX divergence detection.
+      </div>
+    </div>
+  `;
+}
+
+// ==================== 7. ACTIONS & ANDROID BRIDGE ====================
+function toggleCompareCode(code) {
+  if (state.compareCodes.includes(code)) {
+    if (state.compareCodes.length > 1) state.compareCodes = state.compareCodes.filter(c => c !== code);
+  } else {
+    state.compareCodes.push(code);
+  }
+  renderCurrent();
+}
+
+function setCompareRange(r) {
+  state.compareRange = r;
+  hoveredPointIdx = null;
+  renderCurrent();
+}
+
+function runDivergenceBrief() {
+  const us = INDICES.find(i => i.code === "NDX");
+  const dax = INDICES.find(i => i.code === "DAX");
+  const n225 = INDICES.find(i => i.code === "N225");
+  const bse = INDICES.find(i => i.code === "SENSEX");
+  const peGap = (us.pe - dax.pe).toFixed(1);
+  const volGap = (n225.vol - bse.vol).toFixed(1);
+  aiDivergenceBrief = state.tier === "student"
+    ? `• US tech leads YTD (+${us.ytd}%), while Germany's DAX trades much cheaper (${dax.pe}x vs ${us.pe}x P/E).\n• India's BSE SENSEX keeps the lowest volatility (${bse.vol}%), cushioning global swings.\n• Suggested starter balance: pair MSFT or NVDA with RELIANCE.BO / SAP.DE.`
+    : `• Valuation Divergence: NDX commands a +${peGap}x P/E premium over DAX 40 (${dax.pe}x) despite ECB easing tailwinds.\n• Volatility Spread: NIKKEI 225 carries +${volGap}% annualized vol over BSE SENSEX on BOJ FX sensitivity.\n• Tactical Allocation: Trim high-beta US semis on spikes; rotate into SAP.DE & 7203.T.`;
+  renderCurrent();
+  showToast("Cross-exchange divergence brief updated.");
+}
+
+function runNewsSynthesis() {
+  const isStudent = state.tier === "student";
+  const pool = [
+    {
+      headline: "Fed Rate Pause & Hyperscaler AI Capex Guide Higher",
+      region: "US",
+      ticker: "MSFT",
+      signal: "BUY",
+      confidence: 89,
+      macroImpact: "Cloud enterprise spend accelerates even as rate expectations stabilize.",
+      divergenceEffect: "US NASDAQ extends +14.1% YTD lead over DAX industrials.",
+      rationale: isStudent ? "Strong recurring software cash flows make MSFT a steady core holding." : "Azure AI monetization defends forward multiple vs cyclicals."
+    },
+    {
+      headline: "BOJ Policy Normalization Meets Tokyo Capital Reforms",
+      region: "APAC",
+      ticker: "7203.T",
+      signal: "ACCUMULATE",
+      confidence: 85,
+      macroImpact: "Governance reforms & hybrid margins support NIKKEI exporters.",
+      divergenceEffect: "NIKKEI 225 decouples from European PMI softness.",
+      rationale: isStudent ? "Low P/E ratio (~9.8x) and dividends add global balance." : "Buyback catalysts & FX hedging lift ROIC expansion."
+    },
+    {
+      headline: "Domestic SIP Inflows Cushion BSE Blue-Chips Amid ECB Cuts",
+      region: "INDIA",
+      ticker: "RELIANCE.BO",
+      signal: "BUY",
+      confidence: 88,
+      macroImpact: "Retail & digital infrastructure growth insulates BSE SENSEX volatility.",
+      divergenceEffect: "SENSEX maintains lowest realized vol (12.6%) across major hubs.",
+      rationale: isStudent ? "Broad exposure to India's digital, retail & energy growth." : "Low beta EM anchor offsetting US semiconductor concentration."
+    }
+  ];
+  generatedNews = state.newsRegion === "GLOBAL" ? pool : pool.map(p => ({ ...p, region: state.newsRegion }));
+  renderCurrent();
+  showToast(`Synthesized ${generatedNews.length} macro news picks.`);
+}
+
+function saveNewsPick(idx) {
+  const n = generatedNews[idx];
+  if (!n) return;
+  state.savedReports.unshift({ id: "rep_" + Date.now(), tier: state.tier, ...n });
+  renderCurrent();
+  showToast(`Saved ${n.ticker} brief to archive.`);
+}
+
+function deleteSavedReport(id) {
+  state.savedReports = state.savedReports.filter(r => r.id !== id);
+  renderCurrent();
+}
+
+function toggleWatchlist(symbol) {
+  const exists = state.watchlist.some(w => w.symbol === symbol);
+  if (exists) {
+    state.watchlist = state.watchlist.filter(w => w.symbol !== symbol);
+    showToast(`Removed ${symbol} from Smart Watchlist.`);
+  } else {
+    const st = STOCKS.find(s => s.symbol === symbol);
+    const tel = st ? computeStockTelemetry(st) : null;
+    state.watchlist.push({
+      symbol,
+      tag: tel?.isRealTimeDiverging ? "DIVERGENCE_ALERT" : "NONE",
+      alertActive: !!tel?.isRealTimeDiverging,
+      confidence: tel?.isRealTimeDiverging ? 78 : 0,
+      summary: tel ? `${tel.plainReason} Live spread ${tel.liveSpreadDeltaPct.toFixed(2)}% vs ${tel.dominantBenchmark}.` : "Added to Smart Watchlist."
+    });
+    showToast(`Added ${symbol} to Smart Watchlist.`);
+  }
+  renderCurrent();
+}
+
+function loadStarterWatchlist() {
+  state.watchlist = ["NVDA", "7203.T", "SAP.DE", "RELIANCE.BO"].map(sym => ({
+    symbol: sym, tag: "NONE", alertActive: false, confidence: 0, summary: "Ready for NIKKEI, DAX & BSE correlation scan."
+  }));
+  renderCurrent();
+}
+
+function scanWatchlistDivergence() {
+  let triggered = 0;
+  state.watchlist = state.watchlist.map(w => {
+    const st = STOCKS.find(s => s.symbol === w.symbol);
+    if (!st) return w;
+    const tel = computeStockTelemetry(st);
+    const isDiv = tel.level !== "ALIGNED" || Math.abs(tel.liveSpreadDeltaPct) >= 1.2;
+    if (isDiv) triggered++;
+    return {
+      ...w,
+      tag: tel.level === "DIVERGING" ? "CORRELATION_BREAK" : isDiv ? "DIVERGENCE_ALERT" : "ALIGNED",
+      alertActive: isDiv,
+      confidence: isDiv ? Math.min(96, Math.round(74 + Math.abs(tel.drift) * 35)) : 82,
+      summary: state.tier === "adult"
+        ? `${tel.quantReason} | N225=${tel.nikkeiCorr.toFixed(2)}, DAX=${tel.daxCorr.toFixed(2)}, BSE=${tel.bseCorr.toFixed(2)}`
+        : `${tel.plainReason} Anchor spread vs ${tel.dominantBenchmark}: ${tel.liveSpreadDeltaPct >= 0 ? "+" : ""}${tel.liveSpreadDeltaPct.toFixed(2)}%.`
+    };
+  });
+  renderCurrent();
+  showToast(`Tagged ${triggered} divergence alert(s) across NIKKEI, DAX & BSE.`);
+}
+
+function quickAddHolding(symbol) {
+  const st = STOCKS.find(s => s.symbol === symbol);
+  if (!st) return;
+  state.holdings.push({ id: "h_" + Date.now(), symbol: st.symbol, name: st.name, exchange: st.exchange, shares: 5, avgCost: st.price });
+  renderCurrent();
+  showToast(`Added 5 shares of ${st.symbol} to portfolio.`);
+}
+
+function deleteHolding(id) {
+  state.holdings = state.holdings.filter(h => h.id !== id);
+  renderCurrent();
+}
+
+function createHedgeAlert(symbol) {
+  const st = STOCKS.find(s => s.symbol === symbol);
+  if (!st) return;
+  state.alerts.unshift({ id: "a_" + Date.now(), symbol: st.symbol, exchange: st.exchange, targetPct: 2.5, direction: "both", triggered: false, read: false, msg: `Monitoring +/- 2.5% volatility move on ${st.symbol}` });
+  renderCurrent();
+  showToast(`Created +/- 2.5% hedge alert for ${st.symbol}.`);
+}
+
+function deleteAlert(id) {
+  state.alerts = state.alerts.filter(a => a.id !== id);
+  renderCurrent();
+}
+
+function simulateAlertMove() {
+  const target = STOCKS[0];
+  target.dailyPct = 3.85;
+  target.price *= 1.0385;
+  const msg = `${target.symbol} (${target.exchange}) surged +3.85% on semiconductor demand.`;
+  state.alerts.unshift({ id: "a_" + Date.now(), symbol: target.symbol, exchange: target.exchange, targetPct: 2.5, direction: "up", triggered: true, read: false, msg });
+  if (window.FinAdvisorAndroidBridge && window.FinAdvisorAndroidBridge.postAlertNotification) {
+    window.FinAdvisorAndroidBridge.postAlertNotification(`FinAdvisor Alert: ${target.symbol}`, msg);
+  }
+  renderCurrent();
+  showToast(msg);
+}
+
+function runDiagnosticExpr(expr) {
+  state.scenarioExpr = expr.trim() || "PORTFOLIO_AUDIT()";
+  renderCurrent();
+  showToast("Executed Quant Strategy Audit trace.");
+}
+
+// ==================== 8. MODALS ====================
+function openModal(html) {
+  document.getElementById("modalBody").innerHTML = html;
+  document.getElementById("modalBackdrop").classList.add("open");
+}
+
+function closeModal() {
+  document.getElementById("modalBackdrop").classList.remove("open");
+}
+
+function openStockModal(symbol) {
+  const st = STOCKS.find(s => s.symbol === symbol);
+  if (!st) return;
+  const tel = computeStockTelemetry(st);
+  const isStudent = state.tier === "student";
+  openModal(`
+    <div class="section-head">
+      <div>
+        <h2>${st.symbol} • ${st.name}</h2>
+        <div style="font-size:12px;color:var(--muted);">${st.exchange} • P/E ${st.pe}x • Beta ${st.beta} • Div ${st.div}%</div>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="closeModal()">✕</button>
+    </div>
+    <div style="background:var(--surface-elevated);padding:14px;border-radius:14px;">
+      <div class="badge ${isStudent ? "badge-cyan" : "badge-gold"}">${isStudent ? "Student Scholar Thesis" : "Adult Quant Pro Thesis"}</div>
+      <p style="font-size:13px;margin-top:8px;">${isStudent ? st.studentVerdict : st.adultVerdict}</p>
+      <p style="font-size:12px;color:var(--muted);margin-top:6px;">${isStudent ? tel.plainReason : tel.quantReason}</p>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-primary" style="flex:1;" onclick="quickAddHolding('${st.symbol}');closeModal();">+ Add 5 Shares</button>
+      <button class="btn btn-secondary" style="flex:1;" onclick="toggleWatchlist('${st.symbol}');closeModal();">Toggle Watchlist</button>
+    </div>
+  `);
+}
+
+function openTrackWatchlistModal() {
+  openModal(`
+    <div class="section-head"><h2>Manage Smart Watchlist</h2><button class="btn btn-secondary btn-sm" onclick="closeModal()">✕</button></div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      ${STOCKS.map(s => {
+        const w = state.watchlist.some(x => x.symbol === s.symbol);
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--surface-elevated);border-radius:12px;">
+          <div><strong>${s.symbol}</strong> <span style="font-size:12px;color:var(--muted);">(${s.exchange}) ${s.name}</span></div>
+          <button class="btn ${w ? "btn-secondary" : "btn-primary"} btn-sm" onclick="toggleWatchlist('${s.symbol}');openTrackWatchlistModal();">${w ? "Watching" : "+ Track"}</button>
+        </div>`;
+      }).join("")}
+    </div>
+  `);
+}
+
+function openAddHoldingModal() {
+  openModal(`
+    <div class="section-head"><h2>Add Global Holding</h2><button class="btn btn-secondary btn-sm" onclick="closeModal()">✕</button></div>
+    <label style="font-size:12px;color:var(--muted);">Select Stock</label>
+    <select id="holdSym">${STOCKS.map(s => `<option value="${s.symbol}">${s.symbol} — ${s.name} ($${s.price.toFixed(2)})</option>`).join("")}</select>
+    <label style="font-size:12px;color:var(--muted);">Shares</label>
+    <input id="holdShares" type="number" step="0.5" value="5" />
+    <button class="btn btn-primary" onclick="const sym=document.getElementById('holdSym').value;const sh=parseFloat(document.getElementById('holdShares').value)||1;const st=STOCKS.find(x=>x.symbol===sym);state.holdings.push({id:'h_'+Date.now(),symbol:st.symbol,name:st.name,exchange:st.exchange,shares:sh,avgCost:st.price});closeModal();renderCurrent();showToast('Added '+sh+' shares of '+st.symbol);">Save Position</button>
+  `);
+}
+
+function openAddAlertModal() {
+  openModal(`
+    <div class="section-head"><h2>New Price Alert</h2><button class="btn btn-secondary btn-sm" onclick="closeModal()">✕</button></div>
+    <label style="font-size:12px;color:var(--muted);">Select Stock</label>
+    <select id="alertSym">${STOCKS.map(s => `<option value="${s.symbol}">${s.symbol} (${s.exchange})</option>`).join("")}</select>
+    <label style="font-size:12px;color:var(--muted);">Trigger Move (%)</label>
+    <input id="alertPct" type="number" step="0.5" value="2.5" />
+    <button class="btn btn-primary" onclick="const sym=document.getElementById('alertSym').value;const pct=parseFloat(document.getElementById('alertPct').value)||2.5;const st=STOCKS.find(x=>x.symbol===sym);state.alerts.unshift({id:'a_'+Date.now(),symbol:st.symbol,exchange:st.exchange,targetPct:pct,direction:'both',triggered:false,read:false,msg:'Monitoring +/- '+pct+'% volatility swing'});closeModal();renderCurrent();showToast('Alert created for '+st.symbol);">Create Alert</button>
+  `);
+}
+
+renderCurrent();
+</script>
+</body>
+</html>

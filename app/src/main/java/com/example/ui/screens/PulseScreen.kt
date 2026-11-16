@@ -27,6 +27,7 @@ import androidx.compose.material.icons.automirrored.filled.TrendingDown
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Biotech
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Radar
@@ -83,6 +84,7 @@ fun PulseScreen(
     onNavigatePlans: () -> Unit,
     onNavigateDiagnostics: () -> Unit,
     onNavigateWatchlist: () -> Unit,
+    onNavigateWebReplica: () -> Unit,
     watchlistCount: Int,
     watchlistDivergenceCount: Int,
     onSelectStockForDeepDive: (MarketStock) -> Unit,
@@ -377,6 +379,56 @@ fun PulseScreen(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                         contentDescription = "Open AI Smart Watchlist",
                         tint = if (watchlistDivergenceCount > 0) SovereignGold else MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        }
+
+        // Responsive Web MVP Replica Quick Launch
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onNavigateWebReplica)
+                    .testTag("pulse_web_replica_cta"),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.45f)),
+                shape = RoundedCornerShape(18.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(14.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.16f),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.size(44.dp)
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = Icons.Filled.Language,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.secondary
+                            )
+                        }
+                    }
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "FinAdvisor Web MVP Replica",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "Launch responsive website terminal (Desktop & 390dp Mobile preview)",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = "Open FinAdvisor Web Replica",
+                        tint = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
