@@ -1,0 +1,255 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Primitive Helpers ---
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // --- Entity Validation Blueprints ---
+    function isValidUserProfile(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 80 &&
+             data.subscriptionTier in ['student', 'adult'] &&
+             data.riskProfile in ['conservative', 'moderate', 'growth'] &&
+             data.alertThresholdPct is number && data.alertThresholdPct >= 0.5 && data.alertThresholdPct <= 25.0 &&
+             data.notificationsEnabled is bool;
+    }
+
+    function isValidPortfolioHolding(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.symbol is string && data.symbol.size() >= 1 && data.symbol.size() <= 20 &&
+             data.companyName is string && data.companyName.size() >= 1 && data.companyName.size() <= 100 &&
+             data.exchange in ['NASDAQ', 'NYSE', 'TSE', 'XETRA', 'BSE'] &&
+             data.shares is number && data.shares > 0 && data.shares <= 10000000 &&
+             data.avgCostPrice is number && data.avgCostPrice > 0 && data.avgCostPrice <= 10000000 &&
+             data.currency is string && data.currency.size() >= 2 && data.currency.size() <= 10 &&
+             data.sector is string && data.sector.size() >= 1 && data.sector.size() <= 60;
+    }
+
+    function isValidPriceAlert(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.symbol is string && data.symbol.size() >= 1 && data.symbol.size() <= 20 &&
+             data.exchange is string && data.exchange.size() >= 1 && data.exchange.size() <= 20 &&
+             data.targetChangePct is number && data.targetChangePct >= 0.25 && data.targetChangePct <= 50.0 &&
+             data.direction in ['up', 'down', 'both'] &&
+             data.triggerMessage is string && data.triggerMessage.size() <= 300 &&
+             data.triggered is bool &&
+             data.read is bool;
+    }
+
+    function isValidAiNewsReport(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.tierUsed in ['student', 'adult'] &&
+             data.headline is string && data.headline.size() >= 3 && data.headline.size() <= 240 &&
+             data.region is string && data.region.size() >= 2 && data.region.size() <= 40 &&
+             data.macroImpact is string && data.macroImpact.size() >= 3 && data.macroImpact.size() <= 1200 &&
+             data.recommendedTicker is string && data.recommendedTicker.size() >= 1 && data.recommendedTicker.size() <= 24 &&
+             data.actionSignal in ['BUY', 'ACCUMULATE', 'HOLD', 'TRIM'] &&
+             data.confidenceScore is int && data.confidenceScore >= 0 && data.confidenceScore <= 100 &&
+             data.rationale is string && data.rationale.size() >= 3 && data.rationale.size() <= 1500;
+    }
+
+    function isValidWatchlistItem(data) {
+      return data.userId is string && data.userId.size() >= 1 && data.userId.size() <= 128 &&
+             data.symbol is string && data.symbol.size() >= 1 && data.symbol.size() <= 20 &&
+             data.companyName is string && data.companyName.size() >= 1 && data.companyName.size() <= 100 &&
+             data.exchange in ['NASDAQ', 'NYSE', 'TSE', 'XETRA', 'BSE'] &&
+             data.divergenceTag in ['NONE', 'DIVERGENCE_ALERT', 'BULLISH_DECOUPLING', 'CORRELATION_BREAK', 'ALIGNED'] &&
+             data.divergenceAlertActive is bool &&
+             data.divergenceConfidence is int && data.divergenceConfidence >= 0 && data.divergenceConfidence <= 100 &&
+             data.aiCorrelationSummary is string && data.aiCorrelationSummary.size() <= 1200 &&
+             data.targetIndices is string && data.targetIndices.size() >= 2 && data.targetIndices.size() <= 120;
+    }
+
+    // --- Collection Rules ---
+    match /users/{userId} {
+      allow get: if isValidId(userId) && isOwner(userId);
+      allow list: if false;
+
+      allow create: if isValidId(userId) &&
+                       isOwner(userId) &&
+                       incoming().userId == request.auth.uid &&
+                       incoming().keys().hasAll([
+                         'userId', 'displayName', 'subscriptionTier', 'riskProfile',
+                         'alertThresholdPct', 'notificationsEnabled', 'createdAt', 'updatedAt'
+                       ]) &&
+                       incoming().keys().hasOnly([
+                         'userId', 'displayName', 'subscriptionTier', 'riskProfile',
+                         'alertThresholdPct', 'notificationsEnabled', 'createdAt', 'updatedAt'
+                       ]) &&
+                       incoming().createdAt is timestamp && incoming().createdAt <= request.time &&
+                       incoming().updatedAt is timestamp && incoming().updatedAt <= request.time &&
+                       isValidUserProfile(incoming());
+
+      allow update: if isValidId(userId) &&
+                       isOwner(userId) &&
+                       isValidUserProfile(incoming()) &&
+                       incoming().userId == existing().userId &&
+                       incoming().createdAt == existing().createdAt &&
+                       incoming().updatedAt is timestamp && incoming().updatedAt <= request.time && (
+                         incoming().diff(existing()).affectedKeys().hasOnly(['subscriptionTier', 'updatedAt']) ||
+                         incoming().diff(existing()).affectedKeys().hasOnly(['riskProfile', 'alertThresholdPct', 'notificationsEnabled', 'updatedAt']) ||
+                         incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'subscriptionTier', 'riskProfile', 'alertThresholdPct', 'notificationsEnabled', 'updatedAt'])
+                       );
+
+      allow delete: if isValidId(userId) && isOwner(userId);
+
+      // Portfolio Holdings Subcollection
+      match /holdings/{holdingId} {
+        allow get: if isValidId(userId) && isValidId(holdingId) && isOwner(userId);
+        allow list: if isValidId(userId) && isOwner(userId);
+
+        allow create: if isValidId(userId) &&
+                         isValidId(holdingId) &&
+                         isOwner(userId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll([
+                           'userId', 'symbol', 'companyName', 'exchange',
+                           'shares', 'avgCostPrice', 'currency', 'sector', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'symbol', 'companyName', 'exchange',
+                           'shares', 'avgCostPrice', 'currency', 'sector', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().createdAt is timestamp && incoming().createdAt <= request.time &&
+                         incoming().updatedAt is timestamp && incoming().updatedAt <= request.time &&
+                         isValidPortfolioHolding(incoming());
+
+        allow update: if isValidId(userId) &&
+                         isValidId(holdingId) &&
+                         isOwner(userId) &&
+                         isValidPortfolioHolding(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().updatedAt is timestamp && incoming().updatedAt <= request.time &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['shares', 'avgCostPrice', 'updatedAt']);
+
+        allow delete: if isValidId(userId) && isValidId(holdingId) && isOwner(userId);
+      }
+
+      // Personalized Price & Volatility Alerts Subcollection
+      match /alerts/{alertId} {
+        allow get: if isValidId(userId) && isValidId(alertId) && isOwner(userId);
+        allow list: if isValidId(userId) && isOwner(userId);
+
+        allow create: if isValidId(userId) &&
+                         isValidId(alertId) &&
+                         isOwner(userId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll([
+                           'userId', 'symbol', 'exchange', 'targetChangePct',
+                           'direction', 'triggerMessage', 'triggered', 'read', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'symbol', 'exchange', 'targetChangePct',
+                           'direction', 'triggerMessage', 'triggered', 'read', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().createdAt is timestamp && incoming().createdAt <= request.time &&
+                         incoming().updatedAt is timestamp && incoming().updatedAt <= request.time &&
+                         isValidPriceAlert(incoming());
+
+        allow update: if isValidId(userId) &&
+                         isValidId(alertId) &&
+                         isOwner(userId) &&
+                         isValidPriceAlert(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().updatedAt is timestamp && incoming().updatedAt <= request.time && (
+                           incoming().diff(existing()).affectedKeys().hasOnly(['read', 'updatedAt']) ||
+                           incoming().diff(existing()).affectedKeys().hasOnly(['triggered', 'triggerMessage', 'read', 'updatedAt']) ||
+                           incoming().diff(existing()).affectedKeys().hasOnly(['targetChangePct', 'direction', 'updatedAt'])
+                         );
+
+        allow delete: if isValidId(userId) && isValidId(alertId) && isOwner(userId);
+      }
+
+      // AI International News & Share-Pick Reports Subcollection
+      match /ai_reports/{reportId} {
+        allow get: if isValidId(userId) && isValidId(reportId) && isOwner(userId);
+        allow list: if isValidId(userId) && isOwner(userId);
+
+        allow create: if isValidId(userId) &&
+                         isValidId(reportId) &&
+                         isOwner(userId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll([
+                           'userId', 'tierUsed', 'headline', 'region', 'macroImpact',
+                           'recommendedTicker', 'actionSignal', 'confidenceScore',
+                           'rationale', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'tierUsed', 'headline', 'region', 'macroImpact',
+                           'recommendedTicker', 'actionSignal', 'confidenceScore',
+                           'rationale', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().createdAt is timestamp && incoming().createdAt <= request.time &&
+                         incoming().updatedAt is timestamp && incoming().updatedAt <= request.time &&
+                         isValidAiNewsReport(incoming());
+
+        allow update: if false;
+        allow delete: if isValidId(userId) && isValidId(reportId) && isOwner(userId);
+      }
+
+      // Smart Watchlist with AI Divergence Tags Subcollection
+      match /watchlist/{watchlistId} {
+        allow get: if isValidId(userId) && isValidId(watchlistId) && isOwner(userId);
+        allow list: if isValidId(userId) && isOwner(userId);
+
+        allow create: if isValidId(userId) &&
+                         isValidId(watchlistId) &&
+                         isOwner(userId) &&
+                         incoming().userId == request.auth.uid &&
+                         incoming().keys().hasAll([
+                           'userId', 'symbol', 'companyName', 'exchange', 'divergenceTag',
+                           'divergenceAlertActive', 'divergenceConfidence', 'aiCorrelationSummary',
+                           'targetIndices', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().keys().hasOnly([
+                           'userId', 'symbol', 'companyName', 'exchange', 'divergenceTag',
+                           'divergenceAlertActive', 'divergenceConfidence', 'aiCorrelationSummary',
+                           'targetIndices', 'createdAt', 'updatedAt'
+                         ]) &&
+                         incoming().createdAt is timestamp && incoming().createdAt <= request.time &&
+                         incoming().updatedAt is timestamp && incoming().updatedAt <= request.time &&
+                         isValidWatchlistItem(incoming());
+
+        allow update: if isValidId(userId) &&
+                         isValidId(watchlistId) &&
+                         isOwner(userId) &&
+                         isValidWatchlistItem(incoming()) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().updatedAt is timestamp && incoming().updatedAt <= request.time &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'divergenceTag', 'divergenceAlertActive', 'divergenceConfidence',
+                           'aiCorrelationSummary', 'targetIndices', 'updatedAt'
+                         ]);
+
+        allow delete: if isValidId(userId) && isValidId(watchlistId) && isOwner(userId);
+      }
+    }
+  }
+}

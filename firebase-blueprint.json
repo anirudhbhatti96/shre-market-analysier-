@@ -1,0 +1,171 @@
+{
+  "entities": {
+    "UserAdvisoryProfile": {
+      "title": "UserAdvisoryProfile",
+      "description": "Authenticated subscriber profile storing D2C tier (student vs adult), risk tolerance, and alert preferences.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Firebase Auth UID of the profile owner." },
+        "displayName": { "type": "string", "description": "Display name shown in the FinAdvisor workspace." },
+        "subscriptionTier": { "type": "string", "enum": ["student", "adult"], "description": "Active D2C subscription plan determining AI model and feature tier." },
+        "riskProfile": { "type": "string", "enum": ["conservative", "moderate", "growth"], "description": "Investor risk tolerance." },
+        "alertThresholdPct": { "type": "number", "description": "Percentage move threshold triggering personalized price alerts." },
+        "notificationsEnabled": { "type": "boolean", "description": "Whether price-change notifications are enabled." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp (FieldValue.serverTimestamp)." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp (FieldValue.serverTimestamp)." }
+      },
+      "required": [
+        "userId",
+        "displayName",
+        "subscriptionTier",
+        "riskProfile",
+        "alertThresholdPct",
+        "notificationsEnabled",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "PortfolioHolding": {
+      "title": "PortfolioHolding",
+      "description": "Global equity or index ETF position tracked in the user's real-time portfolio.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner Firebase Auth UID." },
+        "symbol": { "type": "string", "description": "Ticker symbol (e.g. NVDA, AAPL, 7203.T, SAP.DE, RELIANCE.BO)." },
+        "companyName": { "type": "string", "description": "Full company or asset name." },
+        "exchange": { "type": "string", "enum": ["NASDAQ", "NYSE", "TSE", "XETRA", "BSE"], "description": "Primary global exchange." },
+        "shares": { "type": "number", "description": "Number of shares held." },
+        "avgCostPrice": { "type": "number", "description": "Average cost basis per share in USD equivalent." },
+        "currency": { "type": "string", "description": "Native listing currency code." },
+        "sector": { "type": "string", "description": "Industry sector." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp (FieldValue.serverTimestamp)." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp (FieldValue.serverTimestamp)." }
+      },
+      "required": [
+        "userId",
+        "symbol",
+        "companyName",
+        "exchange",
+        "shares",
+        "avgCostPrice",
+        "currency",
+        "sector",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "PriceAlert": {
+      "title": "PriceAlert",
+      "description": "Personalized price and volatility threshold alert rule and trigger log.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner Firebase Auth UID." },
+        "symbol": { "type": "string", "description": "Watched ticker or index symbol." },
+        "exchange": { "type": "string", "description": "Exchange code." },
+        "targetChangePct": { "type": "number", "description": "Absolute percentage change threshold." },
+        "direction": { "type": "string", "enum": ["up", "down", "both"], "description": "Trigger direction." },
+        "triggerMessage": { "type": "string", "description": "Last alert notification message." },
+        "triggered": { "type": "boolean", "description": "Whether this alert has fired." },
+        "read": { "type": "boolean", "description": "Whether the user acknowledged the alert." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp (FieldValue.serverTimestamp)." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp (FieldValue.serverTimestamp)." }
+      },
+      "required": [
+        "userId",
+        "symbol",
+        "exchange",
+        "targetChangePct",
+        "direction",
+        "triggerMessage",
+        "triggered",
+        "read",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "AiNewsReport": {
+      "title": "AiNewsReport",
+      "description": "AI-generated international macroeconomic news impact and share-picking recommendation.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner Firebase Auth UID." },
+        "tierUsed": { "type": "string", "enum": ["student", "adult"], "description": "Consultancy tier model used to generate this report." },
+        "headline": { "type": "string", "description": "International macro or market catalyst headline." },
+        "region": { "type": "string", "description": "Global market region affected." },
+        "macroImpact": { "type": "string", "description": "Summary of cross-exchange divergence and macro effect." },
+        "recommendedTicker": { "type": "string", "description": "Top stock or ETF pick tied to this catalyst." },
+        "actionSignal": { "type": "string", "enum": ["BUY", "ACCUMULATE", "HOLD", "TRIM"], "description": "Consultancy action signal." },
+        "confidenceScore": { "type": "integer", "description": "AI conviction score from 0 to 100." },
+        "rationale": { "type": "string", "description": "Tier-appropriate investment rationale." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp (FieldValue.serverTimestamp)." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp (FieldValue.serverTimestamp)." }
+      },
+      "required": [
+        "userId",
+        "tierUsed",
+        "headline",
+        "region",
+        "macroImpact",
+        "recommendedTicker",
+        "actionSignal",
+        "confidenceScore",
+        "rationale",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "WatchlistItem": {
+      "title": "WatchlistItem",
+      "description": "Smart watchlist stock tracked by the user with AI-tagged NIKKEI, DAX, and BSE correlation divergence alerts.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner Firebase Auth UID." },
+        "symbol": { "type": "string", "description": "Equity ticker symbol." },
+        "companyName": { "type": "string", "description": "Company display name." },
+        "exchange": { "type": "string", "enum": ["NASDAQ", "NYSE", "TSE", "XETRA", "BSE"], "description": "Primary listing exchange." },
+        "divergenceTag": { "type": "string", "enum": ["NONE", "DIVERGENCE_ALERT", "BULLISH_DECOUPLING", "CORRELATION_BREAK", "ALIGNED"], "description": "AI-assigned divergence tag." },
+        "divergenceAlertActive": { "type": "boolean", "description": "True when AI flags a potential Divergence alert." },
+        "divergenceConfidence": { "type": "integer", "description": "AI confidence score (0-100)." },
+        "aiCorrelationSummary": { "type": "string", "description": "AI rationale explaining NIKKEI, DAX, and BSE historical correlation divergence." },
+        "targetIndices": { "type": "string", "description": "Benchmark indices analyzed for correlation (e.g., NIKKEI 225, DAX 40, BSE SENSEX)." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp (FieldValue.serverTimestamp)." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp (FieldValue.serverTimestamp)." }
+      },
+      "required": [
+        "userId",
+        "symbol",
+        "companyName",
+        "exchange",
+        "divergenceTag",
+        "divergenceAlertActive",
+        "divergenceConfidence",
+        "aiCorrelationSummary",
+        "targetIndices",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserAdvisoryProfile" },
+      "description": "User D2C subscription tier and advisory configuration."
+    },
+    "/users/{userId}/holdings/{holdingId}": {
+      "schema": { "$ref": "#/entities/PortfolioHolding" },
+      "description": "User's real-time global equity holdings."
+    },
+    "/users/{userId}/alerts/{alertId}": {
+      "schema": { "$ref": "#/entities/PriceAlert" },
+      "description": "User's personalized price-change and volatility alerts."
+    },
+    "/users/{userId}/ai_reports/{reportId}": {
+      "schema": { "$ref": "#/entities/AiNewsReport" },
+      "description": "Saved AI international news impact analyses and share picks."
+    },
+    "/users/{userId}/watchlist/{watchlistId}": {
+      "schema": { "$ref": "#/entities/WatchlistItem" },
+      "description": "User's real-time smart watchlist stocks with AI divergence alert tags."
+    }
+  }
+}

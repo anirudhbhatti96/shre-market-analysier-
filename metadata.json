@@ -1,0 +1,6 @@
+{
+  "name": "FinAdvisor",
+  "description": "D2C subscription-based AI financial consultancy with global market analytics, US/NIKKEI/DAX/BSE divergence tracking, and Student & Adult advisory tiers.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
